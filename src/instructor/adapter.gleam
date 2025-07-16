@@ -2,6 +2,7 @@ import gleam/http
 import gleam/list
 import gleam/result
 import instructor/types.{type AdapterConfig, type ChatParams, type LLMResult}
+import instructor/http_client
 
 /// Adapter behavior for LLM providers
 pub type Adapter(a) {
@@ -39,9 +40,8 @@ pub type HttpResponse {
 
 /// Make an HTTP request
 pub fn make_request(request: HttpRequest) -> Result(HttpResponse, String) {
-  // This would be implemented using gleam_httpc
-  // For now, returning a placeholder
-  Error("HTTP client not implemented yet")
+  // Use the actual HTTP client implementation
+  http_client.make_http_request(request)
 }
 
 /// Create a basic streaming iterator
