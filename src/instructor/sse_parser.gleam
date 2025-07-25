@@ -1,7 +1,7 @@
-import gleam/string
 import gleam/list
-import gleam/result
 import gleam/option.{type Option, None, Some}
+import gleam/result
+import gleam/string
 
 /// SSE (Server-Sent Events) event
 pub type SSEEvent {
@@ -29,10 +29,10 @@ pub fn parse_sse_line(line: String) -> Option(#(String, String)) {
 
 /// Parse multiple SSE lines into an event
 pub fn parse_sse_event(lines: List(String)) -> Option(SSEEvent) {
-  let parsed_lines = 
+  let parsed_lines =
     lines
     |> list.filter_map(parse_sse_line)
-  
+
   case parsed_lines {
     [] -> None
     _ -> {
@@ -69,7 +69,7 @@ pub fn split_sse_events(text: String) -> List(List(String)) {
   text
   |> string.split("\n\n")
   |> list.map(string.split(_, "\n"))
-  |> list.filter(fn(lines) { 
+  |> list.filter(fn(lines) {
     case lines {
       [""] -> False
       [] -> False

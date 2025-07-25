@@ -1,9 +1,9 @@
 import gleam/option.{type Option, None, Some}
-import instructor/types.{type AdapterConfig}
-import instructor/adapters/openai
 import instructor/adapters/anthropic
 import instructor/adapters/gemini
 import instructor/adapters/ollama
+import instructor/adapters/openai
+import instructor/types.{type AdapterConfig}
 
 /// Global configuration for Instructor
 pub type Config {
@@ -160,7 +160,8 @@ pub fn supports_function_calling(config: Config) -> Bool {
     types.OpenAIConfig(_, _) -> True
     types.AnthropicConfig(_, _) -> True
     types.GeminiConfig(_, _) -> True
-    types.OllamaConfig(_) -> False // Most Ollama models don't support function calling
+    types.OllamaConfig(_) -> False
+    // Most Ollama models don't support function calling
     _ -> False
   }
 }
@@ -169,28 +170,17 @@ pub fn supports_function_calling(config: Config) -> Bool {
 pub fn get_recommended_models(config: Config) -> List(String) {
   case config.default_adapter {
     types.OpenAIConfig(_, _) -> [
-      "gpt-4o",
-      "gpt-4o-mini", 
-      "gpt-4-turbo",
-      "gpt-3.5-turbo"
+      "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo",
     ]
     types.AnthropicConfig(_, _) -> [
-      "claude-3-5-sonnet-20241022",
-      "claude-3-opus-20240229",
-      "claude-3-sonnet-20240229",
-      "claude-3-haiku-20240307"
+      "claude-3-5-sonnet-20241022", "claude-3-opus-20240229",
+      "claude-3-sonnet-20240229", "claude-3-haiku-20240307",
     ]
     types.GeminiConfig(_, _) -> [
-      "gemini-1.5-pro",
-      "gemini-1.5-flash",
-      "gemini-pro"
+      "gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro",
     ]
     types.OllamaConfig(_) -> [
-      "llama2",
-      "llama2:13b",
-      "codellama",
-      "mistral",
-      "neural-chat"
+      "llama2", "llama2:13b", "codellama", "mistral", "neural-chat",
     ]
     _ -> []
   }

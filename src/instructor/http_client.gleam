@@ -2,8 +2,8 @@ import gleam/http
 import gleam/http/request
 import gleam/http/response
 import gleam/httpc
-import gleam/result
 import gleam/list
+import gleam/result
 import gleam/string
 import instructor/adapter.{type HttpRequest, type HttpResponse}
 
@@ -12,12 +12,12 @@ pub fn make_http_request(req: HttpRequest) -> Result(HttpResponse, String) {
   // Create the HTTP request
   case request.to(req.url) {
     Ok(http_request) -> {
-      let updated_request = 
+      let updated_request =
         http_request
         |> request.set_method(req.method)
         |> request.set_body(req.body)
         |> set_headers(req.headers)
-      
+
       // Make the request
       case httpc.send(updated_request) {
         Ok(http_response) -> {
@@ -41,7 +41,7 @@ fn set_headers(
 ) -> http.Request(String) {
   case headers {
     [] -> req
-    [#(name, value), ..rest] -> 
+    [#(name, value), ..rest] ->
       req
       |> request.set_header(name, value)
       |> set_headers(rest)
@@ -106,16 +106,14 @@ pub fn add_common_headers(
   headers: List(#(String, String)),
   user_agent: String,
 ) -> List(#(String, String)) {
-  [
-    #("User-Agent", user_agent),
-    #("Accept", "application/json"),
-    ..headers
-  ]
+  [#("User-Agent", user_agent), #("Accept", "application/json"), ..headers]
 }
 
 /// Validate URL format
 pub fn validate_url(url: String) -> Result(String, String) {
-  case string.starts_with(url, "http://") || string.starts_with(url, "https://") {
+  case
+    string.starts_with(url, "http://") || string.starts_with(url, "https://")
+  {
     True -> Ok(url)
     False -> Error("URL must start with http:// or https://")
   }
@@ -130,12 +128,15 @@ pub fn build_api_url(base_url: String, endpoint: String) -> String {
 
 /// Parse content-type header
 pub fn parse_content_type(headers: List(#(String, String))) -> String {
-  case list.find(headers, fn(header) {
-    let #(name, _) = header
-    string.lowercase(name) == "content-type"
-  }) {
+  case
+    list.find(headers, fn(header) {
+      let #(name, _) = header
+      string.lowercase(name) == "content-type"
+    })
+  {
     Ok(#(_, content_type)) -> content_type
-    Error(_) -> "application/json" // Default
+    Error(_) -> "application/json"
+    // Default
   }
 }
 
@@ -148,6 +149,6 @@ pub fn is_json_response(headers: List(#(String, String))) -> Bool {
 /// Check if response is streaming
 pub fn is_streaming_response(headers: List(#(String, String))) -> Bool {
   let content_type = parse_content_type(headers)
-  string.contains(content_type, "text/stream") || 
-  string.contains(content_type, "text/event-stream")
+  string.contains(content_type, "text/stream")
+  || string.contains(content_type, "text/event-stream")
 }

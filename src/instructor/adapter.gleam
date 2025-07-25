@@ -1,8 +1,8 @@
 import gleam/http
 import gleam/list
 import gleam/result
-import instructor/types.{type AdapterConfig, type ChatParams, type LLMResult}
 import instructor/http_client
+import instructor/types.{type AdapterConfig, type ChatParams, type LLMResult}
 
 /// Adapter behavior for LLM providers
 pub type Adapter(a) {
@@ -31,11 +31,7 @@ pub type HttpRequest {
 
 /// HTTP response
 pub type HttpResponse {
-  HttpResponse(
-    status: Int,
-    headers: List(#(String, String)),
-    body: String,
-  )
+  HttpResponse(status: Int, headers: List(#(String, String)), body: String)
 }
 
 /// Make an HTTP request
@@ -48,9 +44,7 @@ pub fn make_request(request: HttpRequest) -> Result(HttpResponse, String) {
 pub fn streaming_iterator(items: List(a)) -> Iterator(a) {
   case items {
     [] -> Iterator(fn() { Error(Nil) })
-    [first, ..rest] -> Iterator(fn() { 
-      Ok(#(first, streaming_iterator(rest)))
-    })
+    [first, ..rest] -> Iterator(fn() { Ok(#(first, streaming_iterator(rest))) })
   }
 }
 
@@ -61,10 +55,9 @@ pub fn iterator_to_list(iterator: Iterator(a)) -> List(a) {
 
 fn iterator_to_list_helper(iterator: Iterator(a), acc: List(a)) -> List(a) {
   case iterator.next() {
-    Ok(#(item, next_iterator)) -> 
+    Ok(#(item, next_iterator)) ->
       iterator_to_list_helper(next_iterator, [item, ..acc])
-    Error(Nil) -> 
-      acc |> list.reverse()
+    Error(Nil) -> acc |> list.reverse()
   }
 }
 
@@ -78,8 +71,6 @@ pub fn mock_adapter() -> Adapter(String) {
     streaming_chat_completion: fn(_params, _config) {
       streaming_iterator(["{\"partial\": true}", "{\"result\": \"final\"}"])
     },
-    reask_messages: fn(_response, _params, _config) {
-      []
-    },
+    reask_messages: fn(_response, _params, _config) { [] },
   )
 }

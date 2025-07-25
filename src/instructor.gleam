@@ -8,10 +8,13 @@ import instructor/adapter.{type Adapter}
 import instructor/adapters/openai
 import instructor/json_schema.{type JsonSchema}
 import instructor/types.{
-  type ChatParams, type LLMResult, type Message, type ResponseMode, type ValidationContext,
-  ChatParams, Success, ValidationError, AdapterError, Tools
+  type ChatParams, type LLMResult, type Message, type ResponseMode,
+  type ValidationContext, AdapterError, ChatParams, Success, Tools,
+  ValidationError,
 }
-import instructor/validator.{type ValidationResult, type Validator, Valid, Invalid}
+import instructor/validator.{
+  type ValidationResult, type Validator, Invalid, Valid,
+}
 
 /// Main Instructor configuration
 pub type InstructorConfig {
@@ -57,35 +60,36 @@ pub fn chat_completion(
     Some(m) -> m
     None -> config.default_model
   }
-  
+
   let actual_mode = case mode {
     Some(m) -> m
     None -> Tools
   }
-  
+
   let actual_max_retries = case max_retries {
     Some(r) -> r
     None -> config.default_max_retries
   }
-  
+
   let actual_validation_context = case validation_context {
     Some(ctx) -> ctx
     None -> []
   }
-  
-  let params = ChatParams(
-    model: actual_model,
-    messages: messages,
-    temperature: temperature,
-    max_tokens: max_tokens,
-    stream: False,
-    mode: actual_mode,
-    max_retries: actual_max_retries,
-    validation_context: actual_validation_context,
-  )
-  
+
+  let params =
+    ChatParams(
+      model: actual_model,
+      messages: messages,
+      temperature: temperature,
+      max_tokens: max_tokens,
+      stream: False,
+      mode: actual_mode,
+      max_retries: actual_max_retries,
+      validation_context: actual_validation_context,
+    )
+
   case response_model {
-    Single(validator, schema) -> 
+    Single(validator, schema) ->
       do_single_chat_completion(config, params, validator, schema)
     Partial(validator, schema) ->
       do_partial_chat_completion(config, params, validator, schema)
@@ -101,15 +105,24 @@ fn do_single_chat_completion(
   validator: Validator(a),
   schema: JsonSchema,
 ) -> LLMResult(a) {
-  case config.adapter.chat_completion(params, types.OpenAIConfig("test", None)) {
+  case
+    config.adapter.chat_completion(params, types.OpenAIConfig("test", None))
+  {
     Ok(response) -> {
       case json.decode(response, dynamic.dynamic) {
         Ok(json_data) -> {
-          case validator.validate_with_context(validator, json_data, params.validation_context) {
+          case
+            validator.validate_with_context(
+              validator,
+              json_data,
+              params.validation_context,
+            )
+          {
             Valid(validated_data) -> Success(validated_data)
             Invalid(errors) -> {
               case params.max_retries > 0 {
-                True -> retry_with_errors(config, params, validator, schema, errors)
+                True ->
+                  retry_with_errors(config, params, validator, schema, errors)
                 False -> ValidationError(list.map(errors, fn(e) { e.message }))
               }
             }
@@ -131,17 +144,20 @@ fn retry_with_errors(
   errors: List(validator.ValidationError),
 ) -> LLMResult(a) {
   let error_message = validator.format_errors(errors)
-  let retry_message = types.Message(
-    types.System,
-    "The response did not pass validation. Please try again and fix the following validation errors:\n\n" <> error_message
-  )
-  
-  let updated_params = ChatParams(
-    ..params,
-    messages: list.append(params.messages, [retry_message]),
-    max_retries: params.max_retries - 1,
-  )
-  
+  let retry_message =
+    types.Message(
+      types.System,
+      "The response did not pass validation. Please try again and fix the following validation errors:\n\n"
+        <> error_message,
+    )
+
+  let updated_params =
+    ChatParams(
+      ..params,
+      messages: list.append(params.messages, [retry_message]),
+      max_retries: params.max_retries - 1,
+    )
+
   do_single_chat_completion(config, updated_params, validator, schema)
 }
 

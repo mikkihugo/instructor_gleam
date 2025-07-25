@@ -64,14 +64,18 @@ pub fn bool_validator() -> Validator(Bool) {
 /// Create a validator for optional values
 pub fn optional_validator(validator: Validator(a)) -> Validator(Option(a)) {
   fn(value, context) {
-    case dynamic.optional(fn(v) { 
-      case validator(v, context) {
-        Valid(result) -> Ok(result)
-        Invalid(_) -> Error([dynamic.DecodeError("validation failed", "", [])])
-      }
-    })(value) {
+    case
+      dynamic.optional(fn(v) {
+        case validator(v, context) {
+          Valid(result) -> Ok(result)
+          Invalid(_) ->
+            Error([dynamic.DecodeError("validation failed", "", [])])
+        }
+      })(value)
+    {
       Ok(opt) -> Valid(opt)
-      Error(_) -> Invalid([ValidationError("", "Validation failed for optional value")])
+      Error(_) ->
+        Invalid([ValidationError("", "Validation failed for optional value")])
     }
   }
 }
@@ -79,12 +83,15 @@ pub fn optional_validator(validator: Validator(a)) -> Validator(Option(a)) {
 /// Create a validator for lists
 pub fn list_validator(validator: Validator(a)) -> Validator(List(a)) {
   fn(value, context) {
-    case dynamic.list(fn(v) {
-      case validator(v, context) {
-        Valid(result) -> Ok(result)
-        Invalid(_) -> Error([dynamic.DecodeError("validation failed", "", [])])
-      }
-    })(value) {
+    case
+      dynamic.list(fn(v) {
+        case validator(v, context) {
+          Valid(result) -> Ok(result)
+          Invalid(_) ->
+            Error([dynamic.DecodeError("validation failed", "", [])])
+        }
+      })(value)
+    {
       Ok(lst) -> Valid(lst)
       Error(_) -> Invalid([ValidationError("", "Expected list")])
     }
@@ -95,10 +102,11 @@ pub fn list_validator(validator: Validator(a)) -> Validator(List(a)) {
 pub fn non_empty_string_validator() -> Validator(String) {
   fn(value, context) {
     case string_validator()(value, context) {
-      Valid(s) -> case string.is_empty(s) {
-        True -> Invalid([ValidationError("", "String cannot be empty")])
-        False -> Valid(s)
-      }
+      Valid(s) ->
+        case string.is_empty(s) {
+          True -> Invalid([ValidationError("", "String cannot be empty")])
+          False -> Valid(s)
+        }
       Invalid(errors) -> Invalid(errors)
     }
   }
@@ -128,7 +136,10 @@ pub fn int_range_validator(min: Option(Int), max: Option(Int)) -> Validator(Int)
 }
 
 /// Create a validator that ensures a float is within a range
-pub fn float_range_validator(min: Option(Float), max: Option(Float)) -> Validator(Float) {
+pub fn float_range_validator(
+  min: Option(Float),
+  max: Option(Float),
+) -> Validator(Float) {
   fn(value, context) {
     case float_validator()(value, context) {
       Valid(f) -> {
@@ -154,10 +165,12 @@ pub fn float_range_validator(min: Option(Float), max: Option(Float)) -> Validato
 pub fn enum_validator(allowed_values: List(String)) -> Validator(String) {
   fn(value, context) {
     case string_validator()(value, context) {
-      Valid(s) -> case list.contains(allowed_values, s) {
-        True -> Valid(s)
-        False -> Invalid([ValidationError("", "Value not in allowed enum values")])
-      }
+      Valid(s) ->
+        case list.contains(allowed_values, s) {
+          True -> Valid(s)
+          False ->
+            Invalid([ValidationError("", "Value not in allowed enum values")])
+        }
       Invalid(errors) -> Invalid(errors)
     }
   }
@@ -170,17 +183,21 @@ pub fn custom_validator(
 ) -> Validator(a) {
   fn(value, _context) {
     case decoder(value) {
-      Ok(decoded) -> case custom_validation(decoded) {
-        Ok(validated) -> Valid(validated)
-        Error(msg) -> Invalid([ValidationError("", msg)])
-      }
+      Ok(decoded) ->
+        case custom_validation(decoded) {
+          Ok(validated) -> Valid(validated)
+          Error(msg) -> Invalid([ValidationError("", msg)])
+        }
       Error(_) -> Invalid([ValidationError("", "Decoding failed")])
     }
   }
 }
 
 /// Combine multiple validation errors
-pub fn combine_errors(errors1: List(ValidationError), errors2: List(ValidationError)) -> List(ValidationError) {
+pub fn combine_errors(
+  errors1: List(ValidationError),
+  errors2: List(ValidationError),
+) -> List(ValidationError) {
   list.append(errors1, errors2)
 }
 
@@ -207,7 +224,9 @@ pub fn validate_with_context(
 }
 
 /// Convert validation result to standard Result type
-pub fn to_result(validation: ValidationResult(a)) -> Result(a, List(ValidationError)) {
+pub fn to_result(
+  validation: ValidationResult(a),
+) -> Result(a, List(ValidationError)) {
   case validation {
     Valid(value) -> Ok(value)
     Invalid(errors) -> Error(errors)

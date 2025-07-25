@@ -23,11 +23,23 @@ pub type JsonSchema {
 /// Schema property definition
 pub type SchemaProperty {
   StringProperty(description: Option(String), enum: Option(List(String)))
-  IntProperty(description: Option(String), minimum: Option(Int), maximum: Option(Int))
-  FloatProperty(description: Option(String), minimum: Option(Float), maximum: Option(Float))
+  IntProperty(
+    description: Option(String),
+    minimum: Option(Int),
+    maximum: Option(Int),
+  )
+  FloatProperty(
+    description: Option(String),
+    minimum: Option(Float),
+    maximum: Option(Float),
+  )
   BoolProperty(description: Option(String))
   ArrayProperty(items: JsonSchema, description: Option(String))
-  ObjectProperty(properties: Dict(String, JsonSchema), required: List(String), description: Option(String))
+  ObjectProperty(
+    properties: Dict(String, JsonSchema),
+    required: List(String),
+    description: Option(String),
+  )
   DateProperty(description: Option(String))
   DateTimeProperty(description: Option(String))
 }
@@ -47,7 +59,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     IntProperty(description, minimum, maximum) ->
       JsonSchema(
         type_: "integer",
@@ -60,7 +72,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     FloatProperty(description, minimum, maximum) ->
       JsonSchema(
         type_: "number",
@@ -73,7 +85,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     BoolProperty(description) ->
       JsonSchema(
         type_: "boolean",
@@ -86,7 +98,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     ArrayProperty(items, description) ->
       JsonSchema(
         type_: "array",
@@ -99,7 +111,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     ObjectProperty(properties, required, description) ->
       JsonSchema(
         type_: "object",
@@ -112,7 +124,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: Some(False),
       )
-    
+
     DateProperty(description) ->
       JsonSchema(
         type_: "string",
@@ -125,7 +137,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         pattern: None,
         additional_properties: None,
       )
-    
+
     DateTimeProperty(description) ->
       JsonSchema(
         type_: "string",
@@ -155,13 +167,11 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
     additional_properties,
   ) = schema
 
-  let base_fields = [
-    #("type", json.string(type_)),
-  ]
+  let base_fields = [#("type", json.string(type_))]
 
   let with_properties = case properties {
     Some(props) -> {
-      let prop_json = 
+      let prop_json =
         dict.to_list(props)
         |> list.map(fn(pair) {
           let #(key, value) = pair
@@ -174,17 +184,26 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
   }
 
   let with_items = case items {
-    Some(item_schema) -> [#("items", schema_to_json(item_schema)), ..with_properties]
+    Some(item_schema) -> [
+      #("items", schema_to_json(item_schema)),
+      ..with_properties
+    ]
     None -> with_properties
   }
 
   let with_required = case required {
-    Some(req_list) -> [#("required", json.array(req_list, json.string)), ..with_items]
+    Some(req_list) -> [
+      #("required", json.array(req_list, json.string)),
+      ..with_items
+    ]
     None -> with_items
   }
 
   let with_enum = case enum {
-    Some(enum_list) -> [#("enum", json.array(enum_list, json.string)), ..with_required]
+    Some(enum_list) -> [
+      #("enum", json.array(enum_list, json.string)),
+      ..with_required
+    ]
     None -> with_required
   }
 
@@ -204,7 +223,10 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
   }
 
   let final_fields = case additional_properties {
-    Some(add_props) -> [#("additionalProperties", json.bool(add_props)), ..with_pattern]
+    Some(add_props) -> [
+      #("additionalProperties", json.bool(add_props)),
+      ..with_pattern
+    ]
     None -> with_pattern
   }
 
@@ -232,7 +254,10 @@ pub fn bool_schema(description: Option(String)) -> JsonSchema {
 }
 
 /// Create an array schema
-pub fn array_schema(items: JsonSchema, description: Option(String)) -> JsonSchema {
+pub fn array_schema(
+  items: JsonSchema,
+  description: Option(String),
+) -> JsonSchema {
   property_to_schema(ArrayProperty(items, description))
 }
 
@@ -256,7 +281,10 @@ pub fn datetime_schema(description: Option(String)) -> JsonSchema {
 }
 
 /// Create an enum schema
-pub fn enum_schema(values: List(String), description: Option(String)) -> JsonSchema {
+pub fn enum_schema(
+  values: List(String),
+  description: Option(String),
+) -> JsonSchema {
   property_to_schema(StringProperty(description, Some(values)))
 }
 
