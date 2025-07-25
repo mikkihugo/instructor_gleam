@@ -2,6 +2,15 @@
 
 Instructor is a Gleam library for structured prompting with Large Language Models. It converts LLM text outputs into validated data structures, enabling seamless integration between AI and traditional Gleam applications.
 
+## 🚀 Build Environment Setup
+
+**Important**: Before using this library, you need to set up the build environment. See [BUILD_ENVIRONMENT.md](BUILD_ENVIRONMENT.md) for detailed setup instructions.
+
+**Quick setup:**
+```bash
+./setup_build_env.sh
+```
+
 ## Features
 
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs

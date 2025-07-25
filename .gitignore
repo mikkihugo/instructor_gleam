@@ -1,11 +1,15 @@
 # Gleam build artifacts
 /build/
 
+# Gleam dependency lock
+manifest.toml
+
 # Erlang artifacts
 erl_crash.dump
 
 # Package artifacts
 *.tar
+*.tar.gz
 
 # Temporary files
 /tmp/
