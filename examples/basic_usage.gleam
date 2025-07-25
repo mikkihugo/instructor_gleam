@@ -1,3 +1,7 @@
+// ⚠️ WARNING: This example does not currently work!
+// The library is in early development and has build issues.
+// See PRODUCTION_READINESS.md for current status.
+//
 // Example: Basic text classification with Instructor
 import gleam/io
 import gleam/option.{None, Some}

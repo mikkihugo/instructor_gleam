@@ -12,6 +12,8 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 
 ## Quick Start
 
+⚠️ **Currently Not Functional** - The examples below show the intended API, but the library cannot be built or used yet due to critical issues. See [Development Status](#development-status) below.
+
 ```gleam
 import instructor
 import instructor/types
@@ -95,25 +97,47 @@ let config = instructor.InstructorConfig(
 
 ## Development Status
 
+⚠️ **This library is in early development and is NOT production ready.**
+
 This is a port of the Elixir Instructor library to Gleam. The current implementation includes:
 
 - ✅ Core types and data structures
 - ✅ JSON schema generation
 - ✅ Validation framework (replacing Ecto)
 - ✅ Basic adapter pattern
-- ✅ OpenAI adapter foundation
+- 🚧 OpenAI adapter foundation (placeholder implementations)
 - 🚧 HTTP client implementation
 - 🚧 Streaming support
 - 🚧 Additional adapters (Anthropic, Gemini, etc.)
 - 🚧 Comprehensive test suite
+- ❌ Build system (dependency issues)
+- ❌ Real API integration
+- ❌ Production features
+
+**Current Blockers:**
+- Cannot build due to dependency resolution issues
+- Adapter implementations return mock data
+- No real LLM API integration
+- CI configured for Elixir instead of Gleam
+
+See [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) for a detailed assessment.
 
 ## Installation
 
-Add to your `gleam.toml`:
+⚠️ **Not recommended for installation yet** - The library is in early development and cannot be built.
+
+When ready, installation will be:
 
 ```toml
 [dependencies]
 instructor = { git = "https://github.com/mikkihugo/instructor_gleam" }
+```
+
+For development/contribution:
+```bash
+git clone https://github.com/mikkihugo/instructor_gleam.git
+cd instructor_gleam
+# Note: gleam deps download currently fails
 ```
 
 ## License

@@ -1,16 +1,16 @@
 name = "instructor"
-version = "1.0.0"
-description = "Structured prompting for LLMs"
+version = "0.1.0-alpha"
+description = "Structured prompting for LLMs - Early Development Version"
 licences = ["MIT"]
 repository = { type = "github", user = "mikkihugo", repo = "instructor_gleam" }
 
 target = "erlang"
 
 [dependencies]
-gleam_stdlib = "~> 0.34"
-gleam_http = "~> 3.6"
-gleam_httpc = "~> 0.6"
-gleam_json = "~> 1.0"
+gleam_stdlib = ">= 0.34.0 and < 2.0.0"
+gleam_http = ">= 3.6.0 and < 4.0.0"
+gleam_httpc = ">= 0.6.0 and < 1.0.0"
+gleam_json = ">= 1.0.0 and < 2.0.0"
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.0.0 and < 2.0.0"

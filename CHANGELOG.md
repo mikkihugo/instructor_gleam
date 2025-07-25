@@ -1,8 +1,35 @@
 # Changelog
 
-## [Unreleased](https://github.com/thmsmlr/instructor_ex/compare/v0.0.5..main)
+## [Unreleased] - Early Development
 
-...
+### Status
+- 🚧 **This library is in early development and NOT production ready**
+- 🚧 Current version: 0.1.0-alpha
+- 🚧 See [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md) for detailed status
+
+### Added
+- Core types and data structures ported from Elixir Instructor
+- JSON schema generation system
+- Validation framework (replacing Ecto dependency)
+- Basic adapter pattern for multiple LLM providers
+- OpenAI adapter foundation (placeholder implementation)
+- HTTP client implementation with retry logic
+- Basic test infrastructure
+- Example usage patterns
+
+### Known Issues
+- ❌ Cannot build due to dependency resolution issues
+- ❌ Adapter implementations return mock/placeholder data
+- ❌ No real LLM API integration
+- ❌ Streaming support not implemented (delegates to single completion)
+- ❌ CI configured for Elixir instead of Gleam
+
+### Breaking Changes
+- This is a complete rewrite in Gleam, not compatible with Elixir Instructor
+
+---
+
+*Previous changelog entries below are from the original Elixir Instructor library*
 
 ## [v0.1.0](https://github.com/thmsmlr/instructor_ex/compare/v0.0.5..v0.1.0)
 
