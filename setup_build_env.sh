@@ -4,6 +4,18 @@ set -e
 
 echo "🚀 Setting up Instructor Gleam build environment..."
 
+# Check if Gleam is installed and install if needed
+if ! command -v gleam &> /dev/null; then
+    echo "📦 Installing Gleam 1.11.1..."
+    curl -L https://github.com/gleam-lang/gleam/releases/download/v1.11.1/gleam-v1.11.1-x86_64-unknown-linux-musl.tar.gz -o gleam.tar.gz
+    tar -xzf gleam.tar.gz
+    sudo mv gleam /usr/local/bin/gleam
+    rm gleam.tar.gz
+    echo "✅ Gleam 1.11.1 installed successfully"
+else
+    echo "✅ Gleam is already installed: $(gleam --version)"
+fi
+
 # Check if we're in a network-restricted environment
 if ! curl -s --connect-timeout 5 https://repo.hex.pm/packages/gleam_stdlib > /dev/null 2>&1; then
     echo "⚠️  Network connectivity issue detected."

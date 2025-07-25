@@ -8,7 +8,7 @@ This document explains how to set up a proper build environment for the Instruct
 
 ```bash
 # Download and install Gleam
-curl -L https://github.com/gleam-lang/gleam/releases/download/v1.6.2/gleam-v1.6.2-x86_64-unknown-linux-musl.tar.gz -o gleam.tar.gz
+curl -L https://github.com/gleam-lang/gleam/releases/download/v1.11.1/gleam-v1.11.1-x86_64-unknown-linux-musl.tar.gz -o gleam.tar.gz
 tar -xzf gleam.tar.gz
 sudo mv gleam /usr/local/bin/gleam
 ```
@@ -29,7 +29,7 @@ brew install erlang
 ### 3. Verify Installation
 
 ```bash
-gleam --version  # Should show: gleam 1.6.2
+gleam --version  # Should show: gleam 1.11.1
 erl -version     # Should show Erlang version
 ```
 
@@ -89,7 +89,7 @@ jobs:
         run: sudo apt install -y erlang
       - name: Install Gleam
         run: |
-          curl -L https://github.com/gleam-lang/gleam/releases/download/v1.6.2/gleam-v1.6.2-x86_64-unknown-linux-musl.tar.gz -o gleam.tar.gz
+          curl -L https://github.com/gleam-lang/gleam/releases/download/v1.11.1/gleam-v1.11.1-x86_64-unknown-linux-musl.tar.gz -o gleam.tar.gz
           tar -xzf gleam.tar.gz
           sudo mv gleam /usr/local/bin/gleam
       - name: Build

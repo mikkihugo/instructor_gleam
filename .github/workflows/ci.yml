@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gleam_version: ["1.6.2"]
+        gleam_version: ["1.11.1"]
         erlang_version: ["26"]
     
     steps:
