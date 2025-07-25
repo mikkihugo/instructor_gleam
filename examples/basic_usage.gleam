@@ -1,5 +1,5 @@
-// ⚠️ WARNING: This example does not currently work!
-// The library is in early development and has build issues.
+// 🔧 Note: This example shows the intended API design.
+// The core library works but OpenAI response parsing needs completion.
 // See PRODUCTION_READINESS.md for current status.
 //
 // Example: Basic text classification with Instructor
