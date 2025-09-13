@@ -1,4 +1,5 @@
 import gleam/dict.{type Dict}
+import gleam/int
 import gleam/json
 import gleam/list
 import gleam/option.{type Option, None, Some}
@@ -17,6 +18,8 @@ pub type JsonSchema {
     format: Option(String),
     pattern: Option(String),
     additional_properties: Option(Bool),
+    minimum: Option(Float),
+    maximum: Option(Float),
   )
 }
 
@@ -46,6 +49,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: None,
+        minimum: None,
+        maximum: None,
       )
     
     IntProperty(description, minimum, maximum) ->
@@ -59,6 +64,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: None,
+        minimum: option.map(minimum, int.to_float),
+        maximum: option.map(maximum, int.to_float),
       )
     
     FloatProperty(description, minimum, maximum) ->
@@ -72,6 +79,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: None,
+        minimum: minimum,
+        maximum: maximum,
       )
     
     BoolProperty(description) ->
@@ -85,6 +94,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: None,
+        minimum: None,
+        maximum: None,
       )
     
     ArrayProperty(items, description) ->
@@ -98,6 +109,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: None,
+        minimum: None,
+        maximum: None,
       )
     
     ObjectProperty(properties, required, description) ->
@@ -111,6 +124,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: None,
         pattern: None,
         additional_properties: Some(False),
+        minimum: None,
+        maximum: None,
       )
     
     DateProperty(description) ->
@@ -124,6 +139,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: Some("date"),
         pattern: None,
         additional_properties: None,
+        minimum: None,
+        maximum: None,
       )
     
     DateTimeProperty(description) ->
@@ -137,6 +154,8 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         format: Some("date-time"),
         pattern: None,
         additional_properties: None,
+        minimum: None,
+        maximum: None,
       )
   }
 }
@@ -153,6 +172,8 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
     format,
     pattern,
     additional_properties,
+    minimum,
+    maximum,
   ) = schema
 
   let base_fields = [
@@ -203,9 +224,19 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
     None -> with_format
   }
 
-  let final_fields = case additional_properties {
+  let with_additional_properties = case additional_properties {
     Some(add_props) -> [#("additionalProperties", json.bool(add_props)), ..with_pattern]
     None -> with_pattern
+  }
+
+  let with_minimum = case minimum {
+    Some(min) -> [#("minimum", json.float(min)), ..with_additional_properties]
+    None -> with_additional_properties
+  }
+
+  let final_fields = case maximum {
+    Some(max) -> [#("maximum", json.float(max)), ..with_minimum]
+    None -> with_minimum
   }
 
   json.object(final_fields)
@@ -219,6 +250,15 @@ pub fn string_schema(description: Option(String)) -> JsonSchema {
 /// Create an integer schema
 pub fn int_schema(description: Option(String)) -> JsonSchema {
   property_to_schema(IntProperty(description, None, None))
+}
+
+/// Create an integer schema with a range
+pub fn int_schema_with_range(
+  description: Option(String),
+  minimum: Option(Int),
+  maximum: Option(Int),
+) -> JsonSchema {
+  property_to_schema(IntProperty(description, minimum, maximum))
 }
 
 /// Create a float schema

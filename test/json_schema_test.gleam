@@ -107,6 +107,21 @@ pub fn validator_non_empty_string_test() {
   }
 }
 
+pub fn json_schema_integer_range_test() {
+  let schema = json_schema.int_schema_with_range(
+    Some("A test integer field with a range"),
+    Some(1),
+    Some(10),
+  )
+  let json_str = json_schema.schema_to_string(schema)
+
+  json_str
+  |> should.contain("\"minimum\":1.0")
+
+  json_str
+  |> should.contain("\"maximum\":10.0")
+}
+
 pub fn validator_int_range_test() {
   let validator_fn = validator.int_range_validator(Some(1), Some(10))
   let context = []
