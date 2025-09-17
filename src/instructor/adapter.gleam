@@ -1,7 +1,5 @@
-import gleam/http
 import gleam/list
-import gleam/result
-import instructor/types.{type AdapterConfig, type ChatParams, type LLMResult}
+import instructor/types.{type AdapterConfig, type ChatParams}
 import instructor/http_client
 
 /// Adapter behavior for LLM providers
@@ -19,27 +17,8 @@ pub type Iterator(a) {
   Iterator(next: fn() -> Result(#(a, Iterator(a)), Nil))
 }
 
-/// HTTP request configuration
-pub type HttpRequest {
-  HttpRequest(
-    method: http.Method,
-    url: String,
-    headers: List(#(String, String)),
-    body: String,
-  )
-}
-
-/// HTTP response
-pub type HttpResponse {
-  HttpResponse(
-    status: Int,
-    headers: List(#(String, String)),
-    body: String,
-  )
-}
-
 /// Make an HTTP request
-pub fn make_request(request: HttpRequest) -> Result(HttpResponse, String) {
+pub fn make_request(request: types.HttpRequest) -> Result(types.HttpResponse, String) {
   // Use the actual HTTP client implementation
   http_client.make_http_request(request)
 }

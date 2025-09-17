@@ -1,18 +1,16 @@
-import gleam/http
+import gleam/http.{Post}
 import gleam/json
 import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{None, Some}
 import gleam/string
-import instructor/adapter.{type Adapter, type HttpRequest, type HttpResponse}
-import instructor/json_schema
+import instructor/adapter
 import instructor/types.{
   type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  GeminiConfig, Tools, Json, JsonSchema, MdJson
+  type HttpResponse, GeminiConfig, Tools, Json, JsonSchema, MdJson,
 }
 
 /// Gemini adapter implementation
-pub fn gemini_adapter() -> Adapter(String) {
+pub fn gemini_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "gemini",
     chat_completion: gemini_chat_completion,
@@ -40,12 +38,13 @@ fn gemini_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
         #("Content-Type", "application/json"),
       ]
       
-      let request = adapter.HttpRequest(
-        method: http.Post,
-        url: url,
-        headers: headers,
-        body: json.to_string(request_body),
-      )
+      let request =
+        types.HttpRequest(
+          method: Post,
+          url: url,
+          headers: headers,
+          body: json.to_string(request_body),
+        )
       
       case adapter.make_request(request) {
         Ok(response) -> extract_gemini_response(response, params.mode)
@@ -57,12 +56,12 @@ fn gemini_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
 }
 
 /// Gemini streaming chat completion (placeholder)
-fn gemini_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn gemini_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
   adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Gemini reask messages implementation
-fn gemini_reask_messages(response: String, params: ChatParams, config: AdapterConfig) -> List(Message) {
+fn gemini_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
   [types.Message(types.Assistant, response)]
 }
 
@@ -109,8 +108,8 @@ fn build_gemini_request(params: ChatParams) -> json.Json {
 fn convert_messages_to_gemini(messages: List(Message)) -> List(json.Json) {
   // Gemini uses "contents" with "role" and "parts"
   // System messages need special handling
-  let #(system_messages, user_messages) = split_by_system(messages)
-  
+  let #(_system_messages, user_messages) = split_by_system(messages)
+
   // For now, just convert user messages
   user_messages
   |> list.map(message_to_gemini_content)
@@ -206,15 +205,18 @@ fn extract_gemini_response(response: HttpResponse, mode: ResponseMode) -> Result
 }
 
 /// Extract response from Gemini tools
-fn extract_gemini_tools_response(body: String) -> Result(String, String) {
+fn extract_gemini_tools_response(_body: String) -> Result(String, String) {
   // Parse Gemini response and extract function call results
   Ok("{\"extracted\": \"from gemini tools\"}")
 }
 
 /// Extract response from Gemini text
+import gleam/dynamic
+import gleam/dynamic/decode
+
 fn extract_gemini_text_response(body: String) -> Result(String, String) {
   // Gemini response format: {"candidates": [{"content": {"parts": [{"text": "..."}]}}]}
-  case json.decode(body, json.dynamic) {
+  case json.parse(body, using: decode.dynamic) {
     Ok(parsed) -> {
       case extract_gemini_content(parsed) {
         Ok(content) -> Ok(content)
@@ -226,29 +228,7 @@ fn extract_gemini_text_response(body: String) -> Result(String, String) {
 }
 
 /// Extract content from Gemini response structure
-fn extract_gemini_content(data: json.Dynamic) -> Result(String, String) {
+fn extract_gemini_content(_data: dynamic.Dynamic) -> Result(String, String) {
   // This would need proper JSON decoding implementation
   Ok("{\"extracted\": \"from gemini\"}")
-}
-
-/// Safety settings for Gemini
-fn default_safety_settings() -> List(json.Json) {
-  [
-    json.object([
-      #("category", json.string("HARM_CATEGORY_HARASSMENT")),
-      #("threshold", json.string("BLOCK_MEDIUM_AND_ABOVE")),
-    ]),
-    json.object([
-      #("category", json.string("HARM_CATEGORY_HATE_SPEECH")),
-      #("threshold", json.string("BLOCK_MEDIUM_AND_ABOVE")),
-    ]),
-    json.object([
-      #("category", json.string("HARM_CATEGORY_SEXUALLY_EXPLICIT")),
-      #("threshold", json.string("BLOCK_MEDIUM_AND_ABOVE")),
-    ]),
-    json.object([
-      #("category", json.string("HARM_CATEGORY_DANGEROUS_CONTENT")),
-      #("threshold", json.string("BLOCK_MEDIUM_AND_ABOVE")),
-    ]),
-  ]
 }

@@ -3,8 +3,8 @@ import gleeunit/should
 import gleam/dynamic
 import instructor
 import instructor/types
-import instructor/validator
 import instructor/json_schema
+import gleam/option.{Some}
 
 pub fn main() {
   gleeunit.main()
@@ -46,14 +46,20 @@ pub fn json_schema_test() {
   |> should.not_equal("")
 }
 
-// Test validator functionality
-pub fn validator_test() {
-  let validator_fn = validator.string_validator()
-  let context = []
-  
-  case validator.validate_with_context(validator_fn, dynamic.from("test"), context) {
-    validator.Valid(result) -> result |> should.equal("test")
-    validator.Invalid(_) -> should.fail()
+import gleam/dynamic/decode
+
+// Test decoder functionality
+pub fn decoder_test() {
+  let model = instructor.string_response_model("Test description")
+  case model {
+    instructor.Single(validator) -> {
+      let data = dynamic.string("test")
+      case decode.run(data, validator) {
+        Ok(result) -> result |> should.equal("test")
+        Error(_) -> should.fail()
+      }
+    }
+    _ -> should.fail()
   }
 }
 
@@ -68,7 +74,7 @@ pub fn config_test() {
 pub fn response_model_test() {
   let model = instructor.string_response_model("Test description")
   case model {
-    instructor.Single(_, _) -> True |> should.be_true()
+    instructor.Single(_) -> True |> should.be_true()
     _ -> should.fail()
   }
 }

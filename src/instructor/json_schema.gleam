@@ -2,8 +2,6 @@ import gleam/dict.{type Dict}
 import gleam/json
 import gleam/list
 import gleam/option.{type Option, None, Some}
-import gleam/result
-import gleam/string
 
 /// JSON Schema representation
 pub type JsonSchema {
@@ -48,7 +46,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         additional_properties: None,
       )
     
-    IntProperty(description, minimum, maximum) ->
+    IntProperty(description, _minimum, _maximum) ->
       JsonSchema(
         type_: "integer",
         properties: None,
@@ -61,7 +59,7 @@ pub fn property_to_schema(prop: SchemaProperty) -> JsonSchema {
         additional_properties: None,
       )
     
-    FloatProperty(description, minimum, maximum) ->
+    FloatProperty(description, _minimum, _maximum) ->
       JsonSchema(
         type_: "number",
         properties: None,
