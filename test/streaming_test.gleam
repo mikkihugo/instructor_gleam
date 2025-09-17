@@ -2,6 +2,7 @@ import gleeunit
 import gleeunit/should
 import instructor/sse_parser
 import instructor/json_parser
+import gleam/option.{Some, None}
 
 pub fn main() {
   gleeunit.main()

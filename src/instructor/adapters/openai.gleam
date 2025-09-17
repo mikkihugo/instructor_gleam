@@ -1,18 +1,16 @@
-import gleam/http
+import gleam/http.{Post}
 import gleam/json
-import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{None, Some}
 import gleam/string
-import instructor/adapter.{type Adapter, type HttpRequest, type HttpResponse}
-import instructor/json_schema
+import instructor/adapter
 import instructor/types.{
   type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  OpenAIConfig, Tools, Json, JsonSchema, MdJson, message_to_json, messages_to_json
+  type HttpResponse, OpenAIConfig, Tools, Json, JsonSchema, MdJson,
+  messages_to_json,
 }
 
 /// OpenAI adapter implementation
-pub fn openai_adapter() -> Adapter(String) {
+pub fn openai_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "openai",
     chat_completion: openai_chat_completion,
@@ -22,27 +20,31 @@ pub fn openai_adapter() -> Adapter(String) {
 }
 
 /// OpenAI chat completion implementation
-fn openai_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(String, String) {
+fn openai_chat_completion(
+  params: ChatParams,
+  config: AdapterConfig,
+) -> Result(String, String) {
   case config {
     OpenAIConfig(api_key, base_url) -> {
       let url = case base_url {
         Some(base) -> base <> "/chat/completions"
         None -> "https://api.openai.com/v1/chat/completions"
       }
-      
+
       let request_body = build_openai_request(params)
       let headers = [
         #("Authorization", "Bearer " <> api_key),
         #("Content-Type", "application/json"),
       ]
-      
-      let request = adapter.HttpRequest(
-        method: http.Post,
-        url: url,
-        headers: headers,
-        body: json.to_string(request_body),
-      )
-      
+
+      let request =
+        types.HttpRequest(
+          method: Post,
+          url: url,
+          headers: headers,
+          body: json.to_string(request_body),
+        )
+
       case adapter.make_request(request) {
         Ok(response) -> extract_openai_response(response, params.mode)
         Error(err) -> Error("HTTP request failed: " <> err)
@@ -53,13 +55,13 @@ fn openai_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
 }
 
 /// OpenAI streaming chat completion (placeholder)
-fn openai_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn openai_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
   // For now, return a mock streaming response
   adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// OpenAI reask messages implementation
-fn openai_reask_messages(response: String, params: ChatParams, config: AdapterConfig) -> List(Message) {
+fn openai_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
   // Return the assistant's response as a message for retry context
   [types.Message(types.Assistant, response)]
 }
@@ -163,21 +165,21 @@ fn extract_openai_response(response: HttpResponse, mode: ResponseMode) -> Result
 }
 
 /// Extract response from tools/function calling
-fn extract_tools_response(body: String) -> Result(String, String) {
+fn extract_tools_response(_body: String) -> Result(String, String) {
   // Parse the OpenAI response and extract the function call arguments
   // This is a simplified implementation
   Ok("{\"extracted\": \"from tools\"}")
 }
 
 /// Extract response from JSON mode
-fn extract_json_response(body: String) -> Result(String, String) {
+fn extract_json_response(_body: String) -> Result(String, String) {
   // Parse the OpenAI response and extract the content
   // This is a simplified implementation
   Ok("{\"extracted\": \"from json\"}")
 }
 
 /// Extract response from markdown JSON mode
-fn extract_md_json_response(body: String) -> Result(String, String) {
+fn extract_md_json_response(_body: String) -> Result(String, String) {
   // Parse the OpenAI response and extract JSON from markdown code block
   // This is a simplified implementation
   Ok("{\"extracted\": \"from md_json\"}")

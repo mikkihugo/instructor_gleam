@@ -99,13 +99,12 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 
 - ✅ Core types and data structures
 - ✅ JSON schema generation
-- ✅ Validation framework (replacing Ecto)
-- ✅ Basic adapter pattern
-- ✅ OpenAI adapter foundation
-- 🚧 HTTP client implementation
-- 🚧 Streaming support
-- 🚧 Additional adapters (Anthropic, Gemini, etc.)
-- 🚧 Comprehensive test suite
+- ✅ Validation using `gleam/dynamic/decode`
+- ✅ Adapter pattern for multiple LLMs
+- ✅ OpenAI, Anthropic, Gemini, and Ollama adapters
+- ✅ HTTP client implementation
+- ✅ Basic test suite
+- 🚧 Streaming support (basic implementation, needs more testing and features)
 
 ## Installation
 
@@ -113,7 +112,10 @@ Add to your `gleam.toml`:
 
 ```toml
 [dependencies]
-instructor = { git = "https://github.com/mikkihugo/instructor_gleam" }
+gleam_stdlib = "~> 0.34"
+gleam_http = "~> 4.1"
+gleam_httpc = "~> 5.0"
+gleam_json = "~> 3.0"
 ```
 
 ## License

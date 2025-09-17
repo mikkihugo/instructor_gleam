@@ -1,7 +1,27 @@
 import gleam/dynamic
+import gleam/dynamic/decode
+import gleam/http
 import gleam/json
 import gleam/option.{type Option}
-import gleam/result
+
+/// HTTP request configuration
+pub type HttpRequest {
+  HttpRequest(
+    method: http.Method,
+    url: String,
+    headers: List(#(String, String)),
+    body: String,
+  )
+}
+
+/// HTTP response
+pub type HttpResponse {
+  HttpResponse(
+    status: Int,
+    headers: List(#(String, String)),
+    body: String,
+  )
+}
 
 /// Response modes for LLM interactions
 pub type ResponseMode {
@@ -118,15 +138,21 @@ pub fn messages_to_json(messages: List(Message)) -> json.Json {
   json.array(messages, message_to_json)
 }
 
+fn role_decoder() -> decode.Decoder(Role) {
+  decode.string
+  |> decode.then(fn(s) {
+    case string_to_role(s) {
+      Ok(role) -> decode.success(role)
+      Error(_) -> decode.failure(System, "Role")
+    }
+  })
+}
+
 /// Decoder for Message from JSON
-pub fn message_decoder() -> dynamic.Decoder(Message) {
-  dynamic.decode2(
-    Message,
-    dynamic.field("role", fn(dyn) {
-      dynamic.string(dyn)
-      |> result.then(string_to_role)
-      |> result.replace_error([dynamic.DecodeError("Invalid role", "", [])])
-    }),
-    dynamic.field("content", dynamic.string),
-  )
+pub fn message_decoder() -> decode.Decoder(Message) {
+  {
+    use role <- decode.field("role", role_decoder())
+    use content <- decode.field("content", decode.string)
+    decode.success(Message(role: role, content: content))
+  }
 }

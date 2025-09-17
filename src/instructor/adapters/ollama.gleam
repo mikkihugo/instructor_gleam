@@ -1,18 +1,18 @@
-import gleam/http
+import gleam/dynamic
+import gleam/dynamic/decode
+import gleam/http.{Get, Post}
 import gleam/json
-import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{None, Some}
 import gleam/string
-import instructor/adapter.{type Adapter, type HttpRequest, type HttpResponse}
-import instructor/json_schema
+import instructor/adapter
 import instructor/types.{
   type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  OllamaConfig, Tools, Json, JsonSchema, MdJson, message_to_json, messages_to_json
+  type HttpResponse, OllamaConfig, Tools, Json, JsonSchema, MdJson,
+  messages_to_json,
 }
 
 /// Ollama adapter implementation
-pub fn ollama_adapter() -> Adapter(String) {
+pub fn ollama_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "ollama",
     chat_completion: ollama_chat_completion,
@@ -32,12 +32,13 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
         #("Content-Type", "application/json"),
       ]
       
-      let request = adapter.HttpRequest(
-        method: http.Post,
-        url: url,
-        headers: headers,
-        body: json.to_string(request_body),
-      )
+      let request =
+        types.HttpRequest(
+          method: Post,
+          url: url,
+          headers: headers,
+          body: json.to_string(request_body),
+        )
       
       case adapter.make_request(request) {
         Ok(response) -> extract_ollama_response(response, params.mode)
@@ -49,12 +50,12 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
 }
 
 /// Ollama streaming chat completion (placeholder)
-fn ollama_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn ollama_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
   adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Ollama reask messages implementation
-fn ollama_reask_messages(response: String, params: ChatParams, config: AdapterConfig) -> List(Message) {
+fn ollama_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
   [types.Message(types.Assistant, response)]
 }
 
@@ -120,7 +121,7 @@ fn extract_ollama_response(response: HttpResponse, mode: ResponseMode) -> Result
 /// Extract JSON response from Ollama
 fn extract_ollama_json_response(body: String) -> Result(String, String) {
   // Ollama response format: {"message": {"role": "assistant", "content": "..."}}
-  case json.decode(body, json.dynamic) {
+  case json.parse(body, using: decode.dynamic) {
     Ok(parsed) -> {
       case extract_ollama_content(parsed) {
         Ok(content) -> Ok(content)
@@ -140,7 +141,7 @@ fn extract_ollama_md_json_response(body: String) -> Result(String, String) {
 }
 
 /// Extract content from Ollama response structure
-fn extract_ollama_content(data: json.Dynamic) -> Result(String, String) {
+fn extract_ollama_content(_data: dynamic.Dynamic) -> Result(String, String) {
   // This would need proper JSON decoding implementation
   Ok("{\"extracted\": \"from ollama\"}")
 }
@@ -170,13 +171,9 @@ pub fn list_ollama_models(base_url: String) -> Result(List(String), String) {
   let url = base_url <> "/api/tags"
   let headers = [#("Content-Type", "application/json")]
   
-  let request = adapter.HttpRequest(
-    method: http.Get,
-    url: url,
-    headers: headers,
-    body: "",
-  )
-  
+  let request =
+    types.HttpRequest(method: Get, url: url, headers: headers, body: "")
+
   case adapter.make_request(request) {
     Ok(response) -> {
       case response.status {
@@ -191,7 +188,7 @@ pub fn list_ollama_models(base_url: String) -> Result(List(String), String) {
 /// Parse models from Ollama response
 fn parse_ollama_models(body: String) -> Result(List(String), String) {
   // Ollama returns {"models": [{"name": "model1"}, {"name": "model2"}]}
-  case json.decode(body, json.dynamic) {
+  case json.parse(body, using: decode.dynamic) {
     Ok(_parsed) -> {
       // Would need proper JSON decoding to extract model names
       Ok(["llama2", "codellama", "mistral"]) // Placeholder

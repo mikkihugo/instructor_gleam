@@ -1,23 +1,20 @@
-import gleam/http
 import gleam/http/request
-import gleam/http/response
 import gleam/httpc
-import gleam/result
 import gleam/list
 import gleam/string
-import instructor/adapter.{type HttpRequest, type HttpResponse}
+import instructor/types.{type HttpRequest, type HttpResponse, HttpResponse}
 
 /// Make an HTTP request using gleam_httpc
 pub fn make_http_request(req: HttpRequest) -> Result(HttpResponse, String) {
   // Create the HTTP request
   case request.to(req.url) {
     Ok(http_request) -> {
-      let updated_request = 
+      let updated_request =
         http_request
         |> request.set_method(req.method)
         |> request.set_body(req.body)
         |> set_headers(req.headers)
-      
+
       // Make the request
       case httpc.send(updated_request) {
         Ok(http_response) -> {
@@ -36,12 +33,12 @@ pub fn make_http_request(req: HttpRequest) -> Result(HttpResponse, String) {
 
 /// Set headers on an HTTP request
 fn set_headers(
-  req: http.Request(String),
+  req: request.Request(String),
   headers: List(#(String, String)),
-) -> http.Request(String) {
+) -> request.Request(String) {
   case headers {
     [] -> req
-    [#(name, value), ..rest] -> 
+    [#(name, value), ..rest] ->
       req
       |> request.set_header(name, value)
       |> set_headers(rest)
@@ -123,8 +120,14 @@ pub fn validate_url(url: String) -> Result(String, String) {
 
 /// Build base URL for API endpoints
 pub fn build_api_url(base_url: String, endpoint: String) -> String {
-  let trimmed_base = string.trim_right(base_url, "/")
-  let trimmed_endpoint = string.trim_left(endpoint, "/")
+  let trimmed_base = case string.ends_with(base_url, "/") {
+    True -> string.drop_end(base_url, 1)
+    False -> base_url
+  }
+  let trimmed_endpoint = case string.starts_with(endpoint, "/") {
+    True -> string.drop_start(endpoint, 1)
+    False -> endpoint
+  }
   trimmed_base <> "/" <> trimmed_endpoint
 }
 

@@ -1,18 +1,16 @@
-import gleam/http
+import gleam/http.{Post}
 import gleam/json
 import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{None, Some}
 import gleam/string
-import instructor/adapter.{type Adapter, type HttpRequest, type HttpResponse}
-import instructor/json_schema
+import instructor/adapter
 import instructor/types.{
   type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  AnthropicConfig, Tools, Json, JsonSchema, MdJson, message_to_json, messages_to_json
+  type HttpResponse, AnthropicConfig, Tools, Json, JsonSchema, MdJson,
 }
 
 /// Anthropic adapter implementation
-pub fn anthropic_adapter() -> Adapter(String) {
+pub fn anthropic_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "anthropic",
     chat_completion: anthropic_chat_completion,
@@ -37,12 +35,13 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
         #("anthropic-version", "2023-06-01"),
       ]
       
-      let request = adapter.HttpRequest(
-        method: http.Post,
-        url: url,
-        headers: headers,
-        body: json.to_string(request_body),
-      )
+      let request =
+        types.HttpRequest(
+          method: Post,
+          url: url,
+          headers: headers,
+          body: json.to_string(request_body),
+        )
       
       case adapter.make_request(request) {
         Ok(response) -> extract_anthropic_response(response, params.mode)
@@ -54,12 +53,12 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
 }
 
 /// Anthropic streaming chat completion (placeholder)
-fn anthropic_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn anthropic_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
   adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Anthropic reask messages implementation
-fn anthropic_reask_messages(response: String, params: ChatParams, config: AdapterConfig) -> List(Message) {
+fn anthropic_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
   [types.Message(types.Assistant, response)]
 }
 
@@ -95,8 +94,8 @@ fn build_anthropic_request(params: ChatParams) -> json.Json {
 fn convert_messages_to_anthropic(messages: List(Message)) -> List(json.Json) {
   // Anthropic requires alternating user/assistant messages
   // System messages are handled separately
-  let #(system_messages, other_messages) = split_system_messages(messages)
-  
+  let #(_system_messages, other_messages) = split_system_messages(messages)
+
   // For now, just convert non-system messages
   other_messages
   |> list.map(message_to_anthropic_json)
@@ -146,32 +145,43 @@ fn add_anthropic_tools_params(fields: List(#(String, json.Json))) -> List(#(Stri
 }
 
 /// Add JSON mode parameters for Anthropic
-fn add_anthropic_json_params(fields: List(#(String, json.Json)), mode: ResponseMode) -> List(#(String, json.Json)) {
+fn add_anthropic_json_params(
+  fields: List(#(String, json.Json)),
+  _mode: ResponseMode,
+) -> List(#(String, json.Json)) {
   // Anthropic doesn't have native JSON mode, so we add instructions to the system prompt
   fields
 }
 
 /// Extract response from Anthropic API response
-fn extract_anthropic_response(response: HttpResponse, mode: ResponseMode) -> Result(String, String) {
+fn extract_anthropic_response(
+  response: HttpResponse,
+  mode: ResponseMode,
+) -> Result(String, String) {
   case response.status {
     200 -> {
       case mode {
         Tools -> extract_anthropic_tools_response(response.body)
-        Json | JsonSchema | MdJson -> extract_anthropic_text_response(response.body)
+        Json | JsonSchema | MdJson ->
+          extract_anthropic_text_response(response.body)
       }
     }
-    _ -> Error("Anthropic API error: " <> string.inspect(response.status) <> " - " <> response.body)
+    _ ->
+      Error(
+        "Anthropic API error: " <> string.inspect(response.status) <> " - "
+          <> response.body,
+      )
   }
 }
 
 /// Extract response from Anthropic tools
-fn extract_anthropic_tools_response(body: String) -> Result(String, String) {
+fn extract_anthropic_tools_response(_body: String) -> Result(String, String) {
   // Parse Anthropic response and extract tool use results
   Ok("{\"extracted\": \"from anthropic tools\"}")
 }
 
 /// Extract response from Anthropic text
-fn extract_anthropic_text_response(body: String) -> Result(String, String) {
+fn extract_anthropic_text_response(_body: String) -> Result(String, String) {
   // Parse Anthropic response and extract text content
   Ok("{\"extracted\": \"from anthropic text\"}")
 }

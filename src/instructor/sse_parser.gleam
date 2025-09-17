@@ -1,7 +1,14 @@
-import gleam/string
+import gleam/int
 import gleam/list
-import gleam/result
 import gleam/option.{type Option, None, Some}
+import gleam/string
+
+fn option_to_list(opt: Option(a)) -> List(a) {
+  case opt {
+    Some(x) -> [x]
+    None -> []
+  }
+}
 
 /// SSE (Server-Sent Events) event
 pub type SSEEvent {
@@ -18,7 +25,7 @@ pub fn parse_sse_line(line: String) -> Option(#(String, String)) {
   case string.split_once(line, ":") {
     Ok(#(field, value)) -> {
       let trimmed_value = case string.starts_with(value, " ") {
-        True -> string.drop_left(value, 1)
+        True -> string.drop_start(value, 1)
         False -> value
       }
       Some(#(field, trimmed_value))
@@ -29,10 +36,10 @@ pub fn parse_sse_line(line: String) -> Option(#(String, String)) {
 
 /// Parse multiple SSE lines into an event
 pub fn parse_sse_event(lines: List(String)) -> Option(SSEEvent) {
-  let parsed_lines = 
+  let parsed_lines =
     lines
-    |> list.filter_map(parse_sse_line)
-  
+    |> list.flat_map(fn(line) { parse_sse_line(line) |> option_to_list })
+
   case parsed_lines {
     [] -> None
     _ -> {
@@ -52,7 +59,7 @@ fn fold_sse_fields(fields: List(#(String, String)), event: SSEEvent) -> SSEEvent
         "data" -> SSEEvent(..event, data: event.data <> value <> "\n")
         "id" -> SSEEvent(..event, id: Some(value))
         "retry" -> {
-          case string.to_int(value) {
+          case int.parse(value) {
             Ok(retry_val) -> SSEEvent(..event, retry: Some(retry_val))
             Error(_) -> event
           }
@@ -82,7 +89,7 @@ pub fn split_sse_events(text: String) -> List(List(String)) {
 pub fn parse_sse_stream(stream_text: String) -> List(SSEEvent) {
   stream_text
   |> split_sse_events()
-  |> list.filter_map(parse_sse_event)
+  |> list.flat_map(fn(event) { parse_sse_event(event) |> option_to_list })
 }
 
 /// Check if an event is a "done" signal
@@ -105,5 +112,5 @@ pub fn extract_json_data(event: SSEEvent) -> Option(String) {
 pub fn extract_data_events(events: List(SSEEvent)) -> List(String) {
   events
   |> list.filter(fn(event) { !is_done_event(event) })
-  |> list.filter_map(extract_json_data)
+  |> list.flat_map(fn(event) { extract_json_data(event) |> option_to_list })
 }

@@ -1,14 +1,10 @@
 import gleam/option.{type Option, None, Some}
-import instructor/types.{type AdapterConfig}
-import instructor/adapters/openai
-import instructor/adapters/anthropic
-import instructor/adapters/gemini
-import instructor/adapters/ollama
+import instructor/types
 
 /// Global configuration for Instructor
 pub type Config {
   Config(
-    default_adapter: AdapterConfig,
+    default_adapter: types.AdapterConfig,
     default_model: String,
     default_max_retries: Int,
     default_temperature: Option(Float),
@@ -95,7 +91,7 @@ pub fn with_timeout(config: Config, timeout_ms: Int) -> Config {
 }
 
 /// Get environment variable with default
-fn get_env_var(name: String, default: String) -> String {
+fn get_env_var(_name: String, default: String) -> String {
   // In a real implementation, this would read from environment
   // For now, return the default
   default
