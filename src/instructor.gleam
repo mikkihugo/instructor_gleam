@@ -26,10 +26,6 @@ pub type InstructorConfig {
 pub type ResponseModel(a) {
   /// Single response validation
   Single(validator: Validator(a))
-  /// Streaming partial responses
-  Partial(validator: Validator(a))
-  /// Streaming array of responses
-  Array(validator: Validator(a))
 }
 
 /// Create default Instructor configuration
@@ -86,8 +82,6 @@ pub fn chat_completion(
 
   case response_model {
     Single(validator) -> do_single_chat_completion(config, params, validator)
-    Partial(validator) -> do_partial_chat_completion(config, params, validator)
-    Array(validator) -> do_array_chat_completion(config, params, validator)
   }
 }
 
@@ -150,26 +144,6 @@ fn retry_with_errors(
     )
 
   do_single_chat_completion(config, updated_params, validator)
-}
-
-/// Execute partial streaming chat completion (placeholder)
-fn do_partial_chat_completion(
-  config: InstructorConfig,
-  params: ChatParams,
-  validator: Validator(a),
-) -> LLMResult(a) {
-  // For now, delegate to single completion
-  do_single_chat_completion(config, params, validator)
-}
-
-/// Execute array streaming chat completion (placeholder)
-fn do_array_chat_completion(
-  config: InstructorConfig,
-  params: ChatParams,
-  validator: Validator(a),
-) -> LLMResult(a) {
-  // For now, delegate to single completion
-  do_single_chat_completion(config, params, validator)
 }
 
 /// Creates a user message.

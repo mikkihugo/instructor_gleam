@@ -139,17 +139,6 @@ pub fn get_adapter_name(config: Config) -> String {
   }
 }
 
-/// Check if adapter supports streaming
-pub fn supports_streaming(config: Config) -> Bool {
-  case config.default_adapter {
-    types.OpenAIConfig(_, _) -> True
-    types.AnthropicConfig(_, _) -> True
-    types.GeminiConfig(_, _) -> True
-    types.OllamaConfig(_) -> True
-    _ -> False
-  }
-}
-
 /// Check if adapter supports function calling
 pub fn supports_function_calling(config: Config) -> Bool {
   case config.default_adapter {

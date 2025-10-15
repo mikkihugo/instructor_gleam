@@ -7,12 +7,11 @@ pub type Adapter(a) {
   Adapter(
     name: String,
     chat_completion: fn(ChatParams, AdapterConfig) -> Result(String, String),
-    streaming_chat_completion: fn(ChatParams, AdapterConfig) -> Iterator(String),
     reask_messages: fn(String, ChatParams, AdapterConfig) -> List(types.Message),
   )
 }
 
-/// Iterator type for streaming responses
+/// Iterator type for streaming responses (kept for potential future use)
 pub type Iterator(a) {
   Iterator(next: fn() -> Result(#(a, Iterator(a)), Nil))
 }
@@ -53,9 +52,6 @@ pub fn mock_adapter() -> Adapter(String) {
     name: "mock",
     chat_completion: fn(_params, _config) {
       Ok("{\"result\": \"mock response\"}")
-    },
-    streaming_chat_completion: fn(_params, _config) {
-      streaming_iterator(["{\"partial\": true}", "{\"result\": \"final\"}"])
     },
     reask_messages: fn(_response, _params, _config) {
       []

@@ -31,19 +31,6 @@ pub type ResponseMode {
   MdJson
 }
 
-/// Streaming modes for responses
-pub type StreamMode {
-  Partial
-  Array
-}
-
-/// Response wrapper for streaming
-pub type ResponseModel(a) {
-  Single(a)
-  StreamingPartial(a)
-  StreamingArray(a)
-}
-
 /// Chat message role
 pub type Role {
   System
