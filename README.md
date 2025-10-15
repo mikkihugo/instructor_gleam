@@ -7,6 +7,7 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
 - **Multiple LLM Providers**: Support for OpenAI, Anthropic, Gemini, Groq, Ollama, and more
 - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
+- **Streaming Support**: Handle partial and array streaming responses
 - **Type Safe**: Full Gleam type safety for LLM interactions
 
 ## Quick Start
@@ -103,6 +104,7 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 - ✅ OpenAI, Anthropic, Gemini, and Ollama adapters
 - ✅ HTTP client implementation
 - ✅ Basic test suite
+- 🚧 Streaming support (basic implementation, needs more testing and features)
 
 ## Installation
 

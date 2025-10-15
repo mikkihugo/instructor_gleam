@@ -14,6 +14,7 @@ pub fn openai_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "openai",
     chat_completion: openai_chat_completion,
+    streaming_chat_completion: openai_streaming_chat_completion,
     reask_messages: openai_reask_messages,
   )
 }
@@ -51,6 +52,12 @@ fn openai_chat_completion(
     }
     _ -> Error("Invalid config for OpenAI adapter")
   }
+}
+
+/// OpenAI streaming chat completion (placeholder)
+fn openai_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
+  // For now, return a mock streaming response
+  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// OpenAI reask messages implementation

@@ -14,6 +14,7 @@ pub fn anthropic_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "anthropic",
     chat_completion: anthropic_chat_completion,
+    streaming_chat_completion: anthropic_streaming_chat_completion,
     reask_messages: anthropic_reask_messages,
   )
 }
@@ -49,6 +50,11 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
     }
     _ -> Error("Invalid config for Anthropic adapter")
   }
+}
+
+/// Anthropic streaming chat completion (placeholder)
+fn anthropic_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
+  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Anthropic reask messages implementation

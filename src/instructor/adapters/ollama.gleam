@@ -16,6 +16,7 @@ pub fn ollama_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "ollama",
     chat_completion: ollama_chat_completion,
+    streaming_chat_completion: ollama_streaming_chat_completion,
     reask_messages: ollama_reask_messages,
   )
 }
@@ -46,6 +47,11 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
     }
     _ -> Error("Invalid config for Ollama adapter")
   }
+}
+
+/// Ollama streaming chat completion (placeholder)
+fn ollama_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
+  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Ollama reask messages implementation

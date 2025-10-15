@@ -14,6 +14,7 @@ pub fn gemini_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "gemini",
     chat_completion: gemini_chat_completion,
+    streaming_chat_completion: gemini_streaming_chat_completion,
     reask_messages: gemini_reask_messages,
   )
 }
@@ -52,6 +53,11 @@ fn gemini_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
     }
     _ -> Error("Invalid config for Gemini adapter")
   }
+}
+
+/// Gemini streaming chat completion (placeholder)
+fn gemini_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
+  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
 }
 
 /// Gemini reask messages implementation
