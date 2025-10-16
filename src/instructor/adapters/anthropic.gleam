@@ -57,11 +57,11 @@ fn anthropic_chat_completion(
 
 /// Anthropic streaming chat completion
 fn anthropic_streaming_chat_completion(
-  params: ChatParams,
+  _params: ChatParams,
   config: AdapterConfig,
 ) -> adapter.Iterator(String) {
   case config {
-    AnthropicConfig(api_key, base_url) -> {
+    AnthropicConfig(_api_key, _base_url) -> {
       // Simulate Anthropic streaming response format
       // In a real implementation, this would make actual streaming HTTP requests
       adapter.streaming_iterator([

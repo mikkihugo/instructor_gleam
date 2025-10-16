@@ -64,11 +64,11 @@ fn gemini_chat_completion(
 
 /// Gemini streaming chat completion
 fn gemini_streaming_chat_completion(
-  params: ChatParams,
+  _params: ChatParams,
   config: AdapterConfig,
 ) -> adapter.Iterator(String) {
   case config {
-    GeminiConfig(api_key, base_url) -> {
+    GeminiConfig(_api_key, _base_url) -> {
       // Simulate Gemini streaming response format
       adapter.streaming_iterator([
         "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"partial\"}]}}]}\n\n",

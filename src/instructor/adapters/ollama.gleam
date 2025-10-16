@@ -58,7 +58,7 @@ fn ollama_streaming_chat_completion(
   config: AdapterConfig,
 ) -> adapter.Iterator(String) {
   case config {
-    OllamaConfig(base_url) -> {
+    OllamaConfig(_base_url) -> {
       // Simulate Ollama streaming response format (NDJSON)
       adapter.streaming_iterator([
         "{\"model\":\""
