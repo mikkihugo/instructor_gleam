@@ -1,21 +1,3 @@
-//// JSON Schema generation and manipulation
-////
-//// This module provides utilities for creating and working with JSON schemas,
-//// which are used to describe the expected structure of LLM responses.
-//// Schemas enable validation and structured data extraction from LLM outputs.
-////
-//// ## Example
-////
-//// ```gleam
-//// import instructor/json_schema
-////
-//// let person_schema = 
-////   json_schema.object_builder()
-////   |> json_schema.add_string_field("name", "Person's name", True)
-////   |> json_schema.add_int_field("age", "Person's age", True)
-////   |> json_schema.build_object(Some("Person information"))
-//// ```
-
 import gleam/dict.{type Dict}
 import gleam/int
 import gleam/json
@@ -23,7 +5,7 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 
-/// JSON Schema representation following the JSON Schema specification
+/// JSON Schema representation
 pub type JsonSchema {
   JsonSchema(
     type_: String,
@@ -185,7 +167,9 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
     additional_properties,
   ) = schema
 
-  let base_fields = [#("type", json.string(type_))]
+  let base_fields = [
+    #("type", json.string(type_)),
+  ]
 
   let with_properties = case properties {
     Some(props) -> {

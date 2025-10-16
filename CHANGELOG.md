@@ -5,31 +5,6 @@ All notable changes to the Instructor Gleam library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-16
-
-This is the **first stable release** of Instructor for Gleam - a production-ready library for structured prompting with Large Language Models.
-
-### Added
-
-- **Production-Ready Release**: Promoted from beta to stable 1.0.0
-- **Comprehensive Documentation**: 
-  - Full inline documentation for all public APIs
-  - Module-level documentation with examples for all modules
-  - Complete HexDocs configuration for published documentation
-  - Enhanced README with badges, installation guide, and contributing section
-- **Quality Assurance**:
-  - All code properly formatted with `gleam format`
-  - Zero security vulnerabilities in dependencies
-  - Comprehensive test coverage
-  - Release-level documentation standards
-
-### Changed
-
-- Version bumped from 1.0.0-beta.1 to 1.0.0
-- README updated to release level with badges and improved structure
-- HexDocs configuration enhanced with extras and source links
-- All source files now include comprehensive module-level documentation
-
 ## [1.0.0-beta.1] - 2025-01-16
 
 This is the first beta release of Instructor for Gleam - a complete rewrite from the Elixir version with idiomatic Gleam patterns and type safety.

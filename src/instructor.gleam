@@ -1,44 +1,3 @@
-//// Instructor for Gleam - Structured Prompting for Large Language Models
-////
-//// This module provides the main API for interacting with LLMs using structured
-//// prompting. It converts LLM text outputs into validated data structures, enabling
-//// seamless integration between AI and traditional Gleam applications.
-////
-//// ## Features
-////
-//// - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
-//// - **Multiple LLM Providers**: Support for OpenAI, Anthropic, Gemini, Groq, and Ollama
-//// - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
-//// - **Streaming Support**: Handle partial and array streaming responses
-//// - **Type Safe**: Full Gleam type safety for LLM interactions
-////
-//// ## Example
-////
-//// ```gleam
-//// import instructor
-//// import instructor/types
-////
-//// // Create configuration
-//// let config = instructor.default_config()
-////
-//// // Create a response model
-//// let response_model = instructor.string_response_model("Extract the sentiment")
-////
-//// // Make a chat completion
-//// let messages = [instructor.user_message("I love Gleam programming!")]
-////
-//// case instructor.chat_completion(
-////   config,
-////   response_model,
-////   messages,
-////   None, None, None, None, None, None,
-//// ) {
-////   types.Success(result) -> io.println("Result: " <> result)
-////   types.ValidationError(errors) -> io.println("Validation failed")
-////   types.AdapterError(error) -> io.println("API error")
-//// }
-//// ```
-
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/json
@@ -55,7 +14,6 @@ import instructor/types.{
   ValidationError,
 }
 
-/// A validator is a decoder that can parse and validate dynamic data
 pub type Validator(a) =
   decode.Decoder(a)
 

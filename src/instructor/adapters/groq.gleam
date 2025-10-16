@@ -1,9 +1,3 @@
-//// Groq adapter implementation
-////
-//// This module provides the adapter implementation for Groq's API,
-//// which is compatible with OpenAI's API format. Groq provides fast inference
-//// for open-source models like Llama 3.3, Llama 3.1, and Mixtral.
-
 import gleam/http.{Post}
 import gleam/json
 import gleam/option.{None, Some}
@@ -16,9 +10,6 @@ import instructor/types.{
 }
 
 /// Groq adapter implementation (compatible with OpenAI API)
-/// 
-/// Creates an adapter for communicating with Groq's fast inference API.
-/// Supports Llama 3.3, Llama 3.1, Mixtral, and other open-source models.
 pub fn groq_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "groq",

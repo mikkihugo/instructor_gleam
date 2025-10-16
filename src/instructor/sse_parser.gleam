@@ -1,15 +1,8 @@
-//// Server-Sent Events (SSE) parser
-////
-//// This module provides utilities for parsing Server-Sent Events (SSE) streams,
-//// which are commonly used by LLM providers for streaming responses.
-//// SSE is a standard for server-to-client streaming over HTTP.
-
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 
-/// Convert an Option to a List for flat_map operations
 fn option_to_list(opt: Option(a)) -> List(a) {
   case opt {
     Some(x) -> [x]
@@ -17,7 +10,7 @@ fn option_to_list(opt: Option(a)) -> List(a) {
   }
 }
 
-/// SSE (Server-Sent Events) event structure
+/// SSE (Server-Sent Events) event
 pub type SSEEvent {
   SSEEvent(
     event_type: Option(String),

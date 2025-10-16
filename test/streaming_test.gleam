@@ -28,7 +28,11 @@ pub fn sse_parse_line_test() {
 }
 
 pub fn sse_parse_event_test() {
-  let lines = ["event: message", "data: {\"hello\": \"world\"}", "id: 123"]
+  let lines = [
+    "event: message",
+    "data: {\"hello\": \"world\"}",
+    "id: 123",
+  ]
 
   case sse_parser.parse_sse_event(lines) {
     Some(event) -> {

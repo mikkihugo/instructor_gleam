@@ -1,28 +1,7 @@
-//// Configuration utilities for Instructor
-////
-//// This module provides configuration builders and helpers for setting up
-//// different LLM provider configurations (OpenAI, Anthropic, Gemini, Groq, Ollama).
-//// It includes default configurations and builder functions for customizing
-//// model selection, retries, temperature, and other parameters.
-////
-//// ## Example
-////
-//// ```gleam
-//// import instructor/config
-////
-//// let config = config.openai_config("your-api-key", None)
-////   |> config.with_model("gpt-4o")
-////   |> config.with_temperature(0.7)
-////   |> config.with_max_retries(3)
-//// ```
-
 import gleam/option.{type Option, None, Some}
 import instructor/types
 
 /// Global configuration for Instructor
-/// 
-/// Contains all settings needed for making LLM requests, including
-/// adapter configuration, default model, retry settings, and timeout values.
 pub type Config {
   Config(
     default_adapter: types.AdapterConfig,
@@ -204,22 +183,36 @@ pub fn supports_function_calling(config: Config) -> Bool {
 pub fn get_recommended_models(config: Config) -> List(String) {
   case config.default_adapter {
     types.OpenAIConfig(_, _) -> [
-      "gpt-5", "gpt-5-pro", "gpt-4o", "gpt-4o-mini", "o1-preview",
+      "gpt-5",
+      "gpt-5-pro",
+      "gpt-4o",
+      "gpt-4o-mini",
+      "o1-preview",
     ]
     types.AnthropicConfig(_, _) -> [
-      "claude-opus-4", "claude-sonnet-4", "claude-3-5-sonnet-20241022",
+      "claude-opus-4",
+      "claude-sonnet-4",
+      "claude-3-5-sonnet-20241022",
       "claude-3-5-haiku-20241022",
     ]
     types.GeminiConfig(_, _) -> [
-      "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite",
+      "gemini-2.5-pro",
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
       "gemini-2.0-flash-exp",
     ]
     types.GroqConfig(_, _) -> [
-      "llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama3-8b-8192",
+      "llama-3.3-70b-versatile",
+      "llama-3.1-70b-versatile",
+      "llama3-8b-8192",
       "mixtral-8x7b-32768",
     ]
     types.OllamaConfig(_) -> [
-      "llama3.2", "llama3.1", "qwen2.5", "mistral", "phi3",
+      "llama3.2",
+      "llama3.1",
+      "qwen2.5",
+      "mistral",
+      "phi3",
     ]
     _ -> []
   }

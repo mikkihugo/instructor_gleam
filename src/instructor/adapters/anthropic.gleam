@@ -1,10 +1,3 @@
-//// Anthropic (Claude) adapter implementation
-////
-//// This module provides the adapter implementation for Anthropic's Claude API,
-//// including Claude 4 Opus, Claude 4 Sonnet, and Claude 3.5 models.
-//// It handles request formatting, response parsing, and streaming for
-//// Anthropic's Messages API.
-
 import gleam/http.{Post}
 import gleam/json
 import gleam/list
@@ -17,9 +10,6 @@ import instructor/types.{
 }
 
 /// Anthropic adapter implementation
-/// 
-/// Creates an adapter for communicating with Anthropic's Claude API.
-/// Supports Claude 4 Opus, Claude 4 Sonnet, and Claude 3.5 models.
 pub fn anthropic_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "anthropic",
