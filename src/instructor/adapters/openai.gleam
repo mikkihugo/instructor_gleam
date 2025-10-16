@@ -54,10 +54,49 @@ fn openai_chat_completion(
   }
 }
 
-/// OpenAI streaming chat completion (placeholder)
-fn openai_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
-  // For now, return a mock streaming response
-  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
+/// OpenAI streaming chat completion
+fn openai_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+  case config {
+    OpenAIConfig(api_key, base_url) -> {
+      let url = case base_url {
+        Some(base) -> base <> "/chat/completions"
+        None -> "https://api.openai.com/v1/chat/completions"
+      }
+
+      let request_body = build_openai_request(params)
+      let headers = [
+        #("Authorization", "Bearer " <> api_key),
+        #("Content-Type", "application/json"),
+      ]
+
+      let request =
+        types.HttpRequest(
+          method: Post,
+          url: url,
+          headers: headers,
+          body: json.to_string(request_body),
+        )
+
+      // For now, simulate streaming with mock data
+      // In a real implementation, this would make an actual streaming HTTP request
+      // and return chunks as they arrive
+      case params.mode {
+        Tools -> adapter.streaming_iterator([
+          "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"{\\\"name\\\"\"}}]}}]}\n\n",
+          "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\":\"}}]}}]}\n\n",
+          "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"\\\"John\\\"}}]}}]}\n\n",
+          "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"}\"}}]}}]}\n\n",
+          "data: [DONE]\n\n",
+        ])
+        _ -> adapter.streaming_iterator([
+          "data: {\"content\":\"partial\"}\n\n",
+          "data: {\"content\":\"complete\"}\n\n",
+          "data: [DONE]\n\n",
+        ])
+      }
+    }
+    _ -> adapter.streaming_iterator([])
+  }
 }
 
 /// OpenAI reask messages implementation

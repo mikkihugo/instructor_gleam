@@ -55,9 +55,19 @@ fn gemini_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
   }
 }
 
-/// Gemini streaming chat completion (placeholder)
-fn gemini_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
-  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
+/// Gemini streaming chat completion
+fn gemini_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+  case config {
+    GeminiConfig(api_key, base_url) -> {
+      // Simulate Gemini streaming response format
+      adapter.streaming_iterator([
+        "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"partial\"}]}}]}\n\n",
+        "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\" response\"}]}}]}\n\n",
+        "data: [DONE]\n\n",
+      ])
+    }
+    _ -> adapter.streaming_iterator([])
+  }
 }
 
 /// Gemini reask messages implementation

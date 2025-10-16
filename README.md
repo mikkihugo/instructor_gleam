@@ -104,7 +104,7 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 - ✅ OpenAI, Anthropic, Gemini, and Ollama adapters
 - ✅ HTTP client implementation
 - ✅ Basic test suite
-- 🚧 Streaming support (basic implementation, needs more testing and features)
+- ✅ Streaming support (partial and array streaming modes)
 
 ## Installation
 

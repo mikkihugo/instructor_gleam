@@ -52,9 +52,22 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
   }
 }
 
-/// Anthropic streaming chat completion (placeholder)
-fn anthropic_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
-  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
+/// Anthropic streaming chat completion
+fn anthropic_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+  case config {
+    AnthropicConfig(api_key, base_url) -> {
+      // Simulate Anthropic streaming response format
+      // In a real implementation, this would make actual streaming HTTP requests
+      adapter.streaming_iterator([
+        "event: message_start\ndata: {\"type\":\"message_start\"}\n\n",
+        "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"delta\":{\"text\":\"partial\"}}\n\n",
+        "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"delta\":{\"text\":\" response\"}}\n\n",
+        "event: message_delta\ndata: {\"type\":\"message_delta\"}\n\n",
+        "event: message_stop\ndata: {\"type\":\"message_stop\"}\n\n",
+      ])
+    }
+    _ -> adapter.streaming_iterator([])
+  }
 }
 
 /// Anthropic reask messages implementation

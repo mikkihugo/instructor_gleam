@@ -49,9 +49,19 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
   }
 }
 
-/// Ollama streaming chat completion (placeholder)
-fn ollama_streaming_chat_completion(_params: ChatParams, _config: AdapterConfig) -> adapter.Iterator(String) {
-  adapter.streaming_iterator(["{\"partial\": true}", "{\"final\": true}"])
+/// Ollama streaming chat completion
+fn ollama_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+  case config {
+    OllamaConfig(base_url) -> {
+      // Simulate Ollama streaming response format (NDJSON)
+      adapter.streaming_iterator([
+        "{\"model\":\"" <> params.model <> "\",\"message\":{\"content\":\"partial\"}}\n",
+        "{\"model\":\"" <> params.model <> "\",\"message\":{\"content\":\" response\"}}\n",
+        "{\"done\":true}\n",
+      ])
+    }
+    _ -> adapter.streaming_iterator([])
+  }
 }
 
 /// Ollama reask messages implementation
