@@ -1,7 +1,9 @@
 import gleam/dict.{type Dict}
+import gleam/int
 import gleam/json
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/string
 
 /// JSON Schema representation
 pub type JsonSchema {
@@ -292,4 +294,247 @@ pub fn enum_schema(
 pub fn schema_to_string(schema: JsonSchema) -> String {
   schema_to_json(schema)
   |> json.to_string()
+}
+
+// Advanced schema builders
+
+/// Create a string schema with pattern validation
+///
+/// ## Example
+///
+/// ```gleam
+/// // Email pattern
+/// let email_schema = string_with_pattern(
+///   Some("User email address"),
+///   "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+/// )
+/// ```
+pub fn string_with_pattern(
+  description: Option(String),
+  pattern: String,
+) -> JsonSchema {
+  JsonSchema(
+    type_: "string",
+    properties: None,
+    items: None,
+    required: None,
+    enum: None,
+    description: description,
+    format: None,
+    pattern: Some(pattern),
+    additional_properties: None,
+  )
+}
+
+/// Create an integer schema with min/max constraints
+///
+/// ## Example
+///
+/// ```gleam
+/// // Age between 0 and 150
+/// let age_schema = int_with_range(
+///   Some("Person's age"),
+///   Some(0),
+///   Some(150)
+/// )
+/// ```
+pub fn int_with_range(
+  description: Option(String),
+  minimum: Option(Int),
+  maximum: Option(Int),
+) -> JsonSchema {
+  // Note: We encode min/max in the description since JsonSchema type doesn't have them
+  let enhanced_description = case description, minimum, maximum {
+    Some(desc), Some(min), Some(max) ->
+      Some(
+        desc
+        <> " (range: "
+        <> int.to_string(min)
+        <> " to "
+        <> int.to_string(max)
+        <> ")",
+      )
+    Some(desc), Some(min), None ->
+      Some(desc <> " (minimum: " <> int.to_string(min) <> ")")
+    Some(desc), None, Some(max) ->
+      Some(desc <> " (maximum: " <> int.to_string(max) <> ")")
+    _, _, _ -> description
+  }
+
+  property_to_schema(IntProperty(enhanced_description, minimum, maximum))
+}
+
+/// Create a number schema with min/max constraints
+///
+/// ## Example
+///
+/// ```gleam
+/// // Score between 0.0 and 1.0
+/// let score_schema = float_with_range(
+///   Some("Confidence score"),
+///   Some(0.0),
+///   Some(1.0)
+/// )
+/// ```
+pub fn float_with_range(
+  description: Option(String),
+  minimum: Option(Float),
+  maximum: Option(Float),
+) -> JsonSchema {
+  // Note: We encode min/max in the description since JsonSchema type doesn't have them
+  let enhanced_description = case description, minimum, maximum {
+    Some(desc), Some(min), Some(max) ->
+      Some(
+        desc
+        <> " (range: "
+        <> string.inspect(min)
+        <> " to "
+        <> string.inspect(max)
+        <> ")",
+      )
+    Some(desc), Some(min), None ->
+      Some(desc <> " (minimum: " <> string.inspect(min) <> ")")
+    Some(desc), None, Some(max) ->
+      Some(desc <> " (maximum: " <> string.inspect(max) <> ")")
+    _, _, _ -> description
+  }
+
+  property_to_schema(FloatProperty(enhanced_description, minimum, maximum))
+}
+
+/// Build a complex object schema using a builder pattern
+///
+/// ## Example
+///
+/// ```gleam
+/// let person_schema = 
+///   object_builder()
+///   |> add_string_field("name", "Person's full name", True)
+///   |> add_int_field("age", "Person's age", True)
+///   |> add_string_field("email", "Email address", False)
+///   |> build_object(Some("Person information"))
+/// ```
+pub type SchemaBuilder {
+  SchemaBuilder(
+    properties: Dict(String, JsonSchema),
+    required_fields: List(String),
+  )
+}
+
+/// Create a new schema builder
+pub fn object_builder() -> SchemaBuilder {
+  SchemaBuilder(properties: dict.new(), required_fields: [])
+}
+
+/// Add a string field to the schema builder
+pub fn add_string_field(
+  builder: SchemaBuilder,
+  name: String,
+  description: String,
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties =
+    dict.insert(builder.properties, name, string_schema(Some(description)))
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Add an integer field to the schema builder
+pub fn add_int_field(
+  builder: SchemaBuilder,
+  name: String,
+  description: String,
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties =
+    dict.insert(builder.properties, name, int_schema(Some(description)))
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Add a boolean field to the schema builder
+pub fn add_bool_field(
+  builder: SchemaBuilder,
+  name: String,
+  description: String,
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties =
+    dict.insert(builder.properties, name, bool_schema(Some(description)))
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Add an enum field to the schema builder
+pub fn add_enum_field(
+  builder: SchemaBuilder,
+  name: String,
+  description: String,
+  values: List(String),
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties =
+    dict.insert(
+      builder.properties,
+      name,
+      enum_schema(values, Some(description)),
+    )
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Add an array field to the schema builder
+pub fn add_array_field(
+  builder: SchemaBuilder,
+  name: String,
+  description: String,
+  items: JsonSchema,
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties =
+    dict.insert(
+      builder.properties,
+      name,
+      array_schema(items, Some(description)),
+    )
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Add a custom field to the schema builder
+pub fn add_field(
+  builder: SchemaBuilder,
+  name: String,
+  schema: JsonSchema,
+  required: Bool,
+) -> SchemaBuilder {
+  let new_properties = dict.insert(builder.properties, name, schema)
+  let new_required = case required {
+    True -> [name, ..builder.required_fields]
+    False -> builder.required_fields
+  }
+  SchemaBuilder(properties: new_properties, required_fields: new_required)
+}
+
+/// Build the final object schema from the builder
+pub fn build_object(
+  builder: SchemaBuilder,
+  description: Option(String),
+) -> JsonSchema {
+  object_schema(builder.properties, builder.required_fields, description)
 }

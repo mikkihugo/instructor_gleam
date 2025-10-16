@@ -59,6 +59,58 @@ let int_model = instructor.int_response_model("A number between 1-10")
 let bool_model = instructor.bool_response_model("True if positive sentiment")
 ```
 
+### Custom Validators
+
+For complex domain models, use custom validators with business logic:
+
+```gleam
+import instructor/validator
+
+pub type Person {
+  Person(name: String, age: Int, email: String)
+}
+
+pub fn person_validator() -> validator.CustomValidator(Person) {
+  let decoder = person_decoder()
+  let validation = validator.compose_validators([
+    validate_name,
+    validate_age, 
+    validate_email,
+  ])
+  validator.custom_validator(decoder, validation)
+}
+```
+
+See `examples/advanced_validators.gleam` for complete examples.
+
+### Advanced JSON Schema Generation
+
+Build sophisticated schemas with the schema builder:
+
+```gleam
+import instructor/json_schema
+
+let person_schema = 
+  json_schema.object_builder()
+  |> json_schema.add_string_field("name", "Person's name", True)
+  |> json_schema.add_int_field("age", "Person's age", True)
+  |> json_schema.add_enum_field("status", "Status", ["active", "inactive"], True)
+  |> json_schema.build_object(Some("Person information"))
+
+// With constraints
+let score_schema = json_schema.float_with_range(
+  Some("Confidence score"),
+  Some(0.0),
+  Some(1.0)
+)
+
+// With pattern validation
+let email_schema = json_schema.string_with_pattern(
+  Some("Email address"),
+  "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+)
+```
+
 ### Messages
 
 Create messages for conversation:
