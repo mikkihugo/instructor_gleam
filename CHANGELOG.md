@@ -5,9 +5,9 @@ All notable changes to the Instructor Gleam library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-16
+## [1.0.0-beta.1] - 2025-01-16
 
-This is the first stable release of Instructor for Gleam - a complete rewrite from the Elixir version with idiomatic Gleam patterns and type safety.
+This is the first beta release of Instructor for Gleam - a complete rewrite from the Elixir version with idiomatic Gleam patterns and type safety.
 
 ### Added
 
