@@ -56,6 +56,15 @@ pub fn gemini_config(api_key: String, base_url: Option(String)) -> Config {
   )
 }
 
+/// Create configuration for Groq
+pub fn groq_config(api_key: String, base_url: Option(String)) -> Config {
+  Config(
+    ..default_config(),
+    default_adapter: types.GroqConfig(api_key, base_url),
+    default_model: "llama3-8b-8192",
+  )
+}
+
 /// Create configuration for Ollama
 pub fn ollama_config(base_url: String) -> Config {
   Config(
@@ -118,6 +127,12 @@ pub fn validate_config(config: Config) -> Result(Config, String) {
         False -> Ok(config)
       }
     }
+    types.GroqConfig(api_key, _) -> {
+      case api_key == "" {
+        True -> Error("Groq API key is required")
+        False -> Ok(config)
+      }
+    }
     types.OllamaConfig(base_url) -> {
       case base_url == "" {
         True -> Error("Ollama base URL is required")
@@ -134,6 +149,7 @@ pub fn get_adapter_name(config: Config) -> String {
     types.OpenAIConfig(_, _) -> "openai"
     types.AnthropicConfig(_, _) -> "anthropic"
     types.GeminiConfig(_, _) -> "gemini"
+    types.GroqConfig(_, _) -> "groq"
     types.OllamaConfig(_) -> "ollama"
     _ -> "unknown"
   }
@@ -156,6 +172,7 @@ pub fn supports_function_calling(config: Config) -> Bool {
     types.OpenAIConfig(_, _) -> True
     types.AnthropicConfig(_, _) -> True
     types.GeminiConfig(_, _) -> True
+    types.GroqConfig(_, _) -> True
     types.OllamaConfig(_) -> False
     // Most Ollama models don't support function calling
     _ -> False
@@ -181,6 +198,12 @@ pub fn get_recommended_models(config: Config) -> List(String) {
       "gemini-1.5-pro",
       "gemini-1.5-flash",
       "gemini-pro",
+    ]
+    types.GroqConfig(_, _) -> [
+      "llama-3.3-70b-versatile",
+      "llama3-8b-8192",
+      "mixtral-8x7b-32768",
+      "gemma2-9b-it",
     ]
     types.OllamaConfig(_) -> [
       "llama2",

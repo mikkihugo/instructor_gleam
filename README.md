@@ -153,10 +153,12 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 - ✅ JSON schema generation
 - ✅ Validation using `gleam/dynamic/decode`
 - ✅ Adapter pattern for multiple LLMs
-- ✅ OpenAI, Anthropic, Gemini, and Ollama adapters
+- ✅ OpenAI, Anthropic, Gemini, Groq, and Ollama adapters
 - ✅ HTTP client implementation
 - ✅ Basic test suite
 - ✅ Streaming support (partial and array streaming modes)
+- ✅ Custom validators for complex domain models
+- ✅ Advanced JSON schema generation with builder pattern
 
 ## Installation
 
