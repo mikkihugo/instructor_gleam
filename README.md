@@ -45,6 +45,15 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 - **qwen2.5** - Qwen 2.5 models
 - **mistral** - Mistral models
 
+### Codex (ChatGPT OAuth - Subscription Only)
+- **codex-mini-latest** - Fast, 200K context, optimized for speed ($1.50/$6 per 1M tokens)
+- **gpt-5-codex** - Full quality, 272K context, better reasoning
+- **gpt-5** - General purpose, 272K context
+
+**Authentication**: Requires `~/.codex/auth.json` (run: `codex login`)
+**Reasoning Effort**: `minimal`, `low`, `medium`, `high` (thinking depth)
+**No Pay-Per-Token**: Subscription-based via ChatGPT Plus/Pro only
+
 ## Quick Start
 
 ```gleam
@@ -172,13 +181,31 @@ Configure adapters in your application:
 
 ```gleam
 import instructor/types
+import instructor/adapters/openai
+import instructor/adapters/codex
 
-let config = instructor.InstructorConfig(
-  adapter: openai_adapter(),
-  default_model: "gpt-4o-mini", 
+// OpenAI (pay-per-token)
+let openai_config = instructor.InstructorConfig(
+  adapter: openai.openai_adapter(),
+  default_model: "gpt-4o-mini",
   default_max_retries: 3,
 )
+
+// Codex (ChatGPT OAuth - subscription only)
+case codex.codex_config_from_file(Some("medium"), False) {
+  Ok(codex_auth) -> {
+    let codex_config = instructor.InstructorConfig(
+      adapter: codex.codex_adapter(),
+      default_model: "codex-mini-latest",
+      default_max_retries: 2,
+    )
+    // Use codex_config for completions
+  }
+  Error(msg) -> io.println("Codex auth failed: " <> msg)
+}
 ```
+
+See `examples/codex_usage.gleam` for complete Codex examples including smart model selection and reasoning effort configuration.
 
 ## Development Status
 
@@ -188,7 +215,7 @@ This is a **production-ready release (v1.0.0)** of the Instructor library for Gl
 - ✅ JSON schema generation
 - ✅ Validation using `gleam/dynamic/decode`
 - ✅ Adapter pattern for multiple LLMs
-- ✅ OpenAI, Anthropic, Gemini, Groq, and Ollama adapters
+- ✅ OpenAI, Anthropic, Gemini, Groq, Ollama, and Codex adapters
 - ✅ HTTP client implementation
 - ✅ Comprehensive test suite
 - ✅ Streaming support (partial and array streaming modes)

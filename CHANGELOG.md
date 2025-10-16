@@ -5,6 +5,25 @@ All notable changes to the Instructor Gleam library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-10-16
+
+### Added
+
+- **Codex (ChatGPT OAuth) Adapter**: Official support for subscription-based ChatGPT API
+  - `CodexOAuthConfig` variant in `AdapterConfig` type
+  - Support for 3 models: `codex-mini-latest`, `gpt-5-codex`, `gpt-5`
+  - Reasoning effort levels: `minimal`, `low`, `medium`, `high`
+  - Reasoning summary support for viewing model's thinking process
+  - Auth tokens read from `~/.codex/auth.json` (managed by codex CLI)
+  - No pay-per-token billing - subscription only (ChatGPT Plus/Pro)
+- **Codex Examples**: Complete usage examples in `examples/codex_usage.gleam`
+- **Documentation**: Codex section added to README with model specs and authentication guide
+
+### Changed
+
+- **types.gleam**: Extended `AdapterConfig` enum with `CodexOAuthConfig` variant
+- **README.md**: Added Codex models to supported models list with pricing and features
+
 ## [1.0.0] - 2025-01-16
 
 This is the **first stable release** of Instructor for Gleam - a production-ready library for structured prompting with Large Language Models.
