@@ -43,7 +43,7 @@ pub fn anthropic_config(api_key: String, base_url: Option(String)) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.AnthropicConfig(api_key, base_url),
-    default_model: "claude-3-haiku-20240307",
+    default_model: "claude-3-5-sonnet-20241022",
   )
 }
 
@@ -52,7 +52,7 @@ pub fn gemini_config(api_key: String, base_url: Option(String)) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.GeminiConfig(api_key, base_url),
-    default_model: "gemini-pro",
+    default_model: "gemini-1.5-flash-latest",
   )
 }
 
@@ -61,7 +61,7 @@ pub fn groq_config(api_key: String, base_url: Option(String)) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.GroqConfig(api_key, base_url),
-    default_model: "llama3-8b-8192",
+    default_model: "llama-3.3-70b-versatile",
   )
 }
 
@@ -70,7 +70,7 @@ pub fn ollama_config(base_url: String) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.OllamaConfig(base_url),
-    default_model: "llama2",
+    default_model: "llama3.2",
   )
 }
 
@@ -186,31 +186,33 @@ pub fn get_recommended_models(config: Config) -> List(String) {
       "gpt-4o",
       "gpt-4o-mini",
       "gpt-4-turbo",
-      "gpt-3.5-turbo",
+      "o1-preview",
+      "o1-mini",
     ]
     types.AnthropicConfig(_, _) -> [
       "claude-3-5-sonnet-20241022",
+      "claude-3-5-haiku-20241022",
       "claude-3-opus-20240229",
       "claude-3-sonnet-20240229",
-      "claude-3-haiku-20240307",
     ]
     types.GeminiConfig(_, _) -> [
-      "gemini-1.5-pro",
-      "gemini-1.5-flash",
-      "gemini-pro",
+      "gemini-2.0-flash-exp",
+      "gemini-1.5-pro-latest",
+      "gemini-1.5-flash-latest",
+      "gemini-1.5-flash-8b",
     ]
     types.GroqConfig(_, _) -> [
       "llama-3.3-70b-versatile",
+      "llama-3.1-70b-versatile",
       "llama3-8b-8192",
       "mixtral-8x7b-32768",
-      "gemma2-9b-it",
     ]
     types.OllamaConfig(_) -> [
-      "llama2",
-      "llama2:13b",
-      "codellama",
+      "llama3.2",
+      "llama3.1",
+      "qwen2.5",
       "mistral",
-      "neural-chat",
+      "phi3",
     ]
     _ -> []
   }

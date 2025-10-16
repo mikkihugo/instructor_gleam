@@ -5,10 +5,39 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 ## Features
 
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
-- **Multiple LLM Providers**: Support for OpenAI, Anthropic, Gemini, Groq, Ollama, and more
+- **Multiple LLM Providers**: Support for OpenAI (GPT-4o, o1), Anthropic (Claude 3.5), Gemini (2.0 Flash), Groq, and Ollama
 - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
 - **Streaming Support**: Handle partial and array streaming responses
 - **Type Safe**: Full Gleam type safety for LLM interactions
+
+## Supported Models
+
+### OpenAI
+- **gpt-4o** - Latest GPT-4 Omni model
+- **gpt-4o-mini** - Fast, cost-effective GPT-4 variant
+- **o1-preview** - Advanced reasoning model
+- **o1-mini** - Faster reasoning model
+
+### Anthropic
+- **claude-3-5-sonnet-20241022** - Latest Claude 3.5 Sonnet (recommended)
+- **claude-3-5-haiku-20241022** - Fast, efficient Claude 3.5
+- **claude-3-opus-20240229** - Most capable Claude 3
+
+### Google Gemini
+- **gemini-2.0-flash-exp** - Latest experimental Gemini 2.0
+- **gemini-1.5-pro-latest** - Most capable Gemini 1.5
+- **gemini-1.5-flash-latest** - Fast, efficient Gemini 1.5
+- **gemini-1.5-flash-8b** - Smaller, faster variant
+
+### Groq (Fast Inference)
+- **llama-3.3-70b-versatile** - Latest Llama 3.3
+- **llama-3.1-70b-versatile** - Llama 3.1 70B
+- **mixtral-8x7b-32768** - Mixtral MoE model
+
+### Ollama (Local)
+- **llama3.2** - Latest Llama 3.2
+- **qwen2.5** - Qwen 2.5 models
+- **mistral** - Mistral models
 
 ## Quick Start
 
