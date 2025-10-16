@@ -43,7 +43,7 @@ pub fn anthropic_config(api_key: String, base_url: Option(String)) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.AnthropicConfig(api_key, base_url),
-    default_model: "claude-3-5-sonnet-20241022",
+    default_model: "claude-sonnet-4",
   )
 }
 
@@ -52,7 +52,7 @@ pub fn gemini_config(api_key: String, base_url: Option(String)) -> Config {
   Config(
     ..default_config(),
     default_adapter: types.GeminiConfig(api_key, base_url),
-    default_model: "gemini-1.5-flash-latest",
+    default_model: "gemini-2.5-flash",
   )
 }
 
@@ -183,23 +183,23 @@ pub fn supports_function_calling(config: Config) -> Bool {
 pub fn get_recommended_models(config: Config) -> List(String) {
   case config.default_adapter {
     types.OpenAIConfig(_, _) -> [
+      "gpt-5",
+      "gpt-5-pro",
       "gpt-4o",
       "gpt-4o-mini",
-      "gpt-4-turbo",
       "o1-preview",
-      "o1-mini",
     ]
     types.AnthropicConfig(_, _) -> [
+      "claude-opus-4",
+      "claude-sonnet-4",
       "claude-3-5-sonnet-20241022",
       "claude-3-5-haiku-20241022",
-      "claude-3-opus-20240229",
-      "claude-3-sonnet-20240229",
     ]
     types.GeminiConfig(_, _) -> [
+      "gemini-2.5-pro",
+      "gemini-2.5-flash",
+      "gemini-2.5-flash-lite",
       "gemini-2.0-flash-exp",
-      "gemini-1.5-pro-latest",
-      "gemini-1.5-flash-latest",
-      "gemini-1.5-flash-8b",
     ]
     types.GroqConfig(_, _) -> [
       "llama-3.3-70b-versatile",

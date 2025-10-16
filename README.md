@@ -5,29 +5,31 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 ## Features
 
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
-- **Multiple LLM Providers**: Support for OpenAI (GPT-4o, o1), Anthropic (Claude 3.5), Gemini (2.0 Flash), Groq, and Ollama
+- **Multiple LLM Providers**: Support for OpenAI (GPT-5), Anthropic (Claude 4), Gemini (2.5), Groq, and Ollama
 - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
 - **Streaming Support**: Handle partial and array streaming responses
 - **Type Safe**: Full Gleam type safety for LLM interactions
 
-## Supported Models
+## Supported Models (2025)
 
 ### OpenAI
-- **gpt-4o** - Latest GPT-4 Omni model
+- **gpt-5** - Latest GPT-5 model (Aug 2025) with 400K context, dynamic thinking mode
+- **gpt-5-pro** - GPT-5 Pro variant for advanced tasks
+- **gpt-4o** - GPT-4 Omni model
 - **gpt-4o-mini** - Fast, cost-effective GPT-4 variant
 - **o1-preview** - Advanced reasoning model
-- **o1-mini** - Faster reasoning model
 
-### Anthropic
-- **claude-3-5-sonnet-20241022** - Latest Claude 3.5 Sonnet (recommended)
+### Anthropic Claude 4
+- **claude-opus-4** - Most powerful Claude 4 model for complex coding and long-running tasks
+- **claude-sonnet-4** - Balanced performance with enhanced coding and reasoning (recommended)
+- **claude-3-5-sonnet-20241022** - Previous generation Claude 3.5
 - **claude-3-5-haiku-20241022** - Fast, efficient Claude 3.5
-- **claude-3-opus-20240229** - Most capable Claude 3
 
-### Google Gemini
-- **gemini-2.0-flash-exp** - Latest experimental Gemini 2.0
-- **gemini-1.5-pro-latest** - Most capable Gemini 1.5
-- **gemini-1.5-flash-latest** - Fast, efficient Gemini 1.5
-- **gemini-1.5-flash-8b** - Smaller, faster variant
+### Google Gemini 2.5
+- **gemini-2.5-pro** - Most capable Gemini 2.5 for complex reasoning
+- **gemini-2.5-flash** - High performance with cost efficiency (recommended)
+- **gemini-2.5-flash-lite** - Lightweight, high-throughput variant
+- **gemini-2.0-flash-exp** - Experimental Gemini 2.0
 
 ### Groq (Fast Inference)
 - **llama-3.3-70b-versatile** - Latest Llama 3.3
