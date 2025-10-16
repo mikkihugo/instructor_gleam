@@ -10,11 +10,12 @@ import instructor/json_parser
 import instructor/sse_parser
 import instructor/types.{
   type ChatParams, type LLMResult, type Message, type ResponseMode,
-  type ValidationContext, ChatParams, Success, ValidationError, AdapterError,
-  Tools,
+  type ValidationContext, AdapterError, ChatParams, Success, Tools,
+  ValidationError,
 }
 
-pub type Validator(a) = decode.Decoder(a)
+pub type Validator(a) =
+  decode.Decoder(a)
 
 /// Main Instructor configuration
 pub type InstructorConfig {
@@ -60,32 +61,33 @@ pub fn chat_completion(
     Some(m) -> m
     None -> config.default_model
   }
-  
+
   let actual_mode = case mode {
     Some(m) -> m
     None -> Tools
   }
-  
+
   let actual_max_retries = case max_retries {
     Some(r) -> r
     None -> config.default_max_retries
   }
-  
+
   let actual_validation_context = case validation_context {
     Some(ctx) -> ctx
     None -> []
   }
-  
-  let params = ChatParams(
-    model: actual_model,
-    messages: messages,
-    temperature: temperature,
-    max_tokens: max_tokens,
-    stream: False,
-    mode: actual_mode,
-    max_retries: actual_max_retries,
-    validation_context: actual_validation_context,
-  )
+
+  let params =
+    ChatParams(
+      model: actual_model,
+      messages: messages,
+      temperature: temperature,
+      max_tokens: max_tokens,
+      stream: False,
+      mode: actual_mode,
+      max_retries: actual_max_retries,
+      validation_context: actual_validation_context,
+    )
 
   case response_model {
     Single(validator) -> do_single_chat_completion(config, params, validator)
@@ -96,7 +98,12 @@ pub fn chat_completion(
 
 fn format_decode_error(error: decode.DecodeError) -> String {
   let path = string.join(error.path, ".")
-  "Expected " <> error.expected <> " but found " <> error.found <> " at path " <> path
+  "Expected "
+  <> error.expected
+  <> " but found "
+  <> error.found
+  <> " at path "
+  <> path
 }
 
 /// Execute single chat completion
@@ -105,7 +112,9 @@ fn do_single_chat_completion(
   params: ChatParams,
   validator: Validator(a),
 ) -> LLMResult(a) {
-  case config.adapter.chat_completion(params, types.OpenAIConfig("test", None)) {
+  case
+    config.adapter.chat_completion(params, types.OpenAIConfig("test", None))
+  {
     Ok(response) -> {
       case json.parse(response, using: validator) {
         Ok(validated_data) -> Success(validated_data)
@@ -163,13 +172,14 @@ fn do_partial_chat_completion(
 ) -> LLMResult(a) {
   // Enable streaming in params
   let streaming_params = ChatParams(..params, stream: True)
-  
+
   // Get streaming iterator from adapter
-  let stream_iterator = config.adapter.streaming_chat_completion(
-    streaming_params,
-    types.OpenAIConfig("test", None),
-  )
-  
+  let stream_iterator =
+    config.adapter.streaming_chat_completion(
+      streaming_params,
+      types.OpenAIConfig("test", None),
+    )
+
   // Process streaming chunks
   process_partial_stream(stream_iterator, validator, dynamic.from(Nil))
 }
@@ -191,7 +201,7 @@ fn process_partial_stream(
     Ok(#(chunk, next_iterator)) -> {
       // Parse SSE events from chunk
       let events = sse_parser.parse_sse_stream(chunk)
-      
+
       // Extract and merge JSON data
       let updated = case events {
         [] -> previous
@@ -202,14 +212,15 @@ fn process_partial_stream(
             [first, ..] -> {
               // Parse the JSON and merge with previous
               case json.parse(first, using: decode.dynamic) {
-                Ok(parsed) -> json_parser.merge_partial_objects(previous, parsed)
+                Ok(parsed) ->
+                  json_parser.merge_partial_objects(previous, parsed)
                 Error(_) -> previous
               }
             }
           }
         }
       }
-      
+
       // Continue processing stream
       process_partial_stream(next_iterator, validator, updated)
     }
@@ -224,13 +235,14 @@ fn do_array_chat_completion(
 ) -> LLMResult(a) {
   // Enable streaming in params
   let streaming_params = ChatParams(..params, stream: True)
-  
+
   // Get streaming iterator from adapter
-  let stream_iterator = config.adapter.streaming_chat_completion(
-    streaming_params,
-    types.OpenAIConfig("test", None),
-  )
-  
+  let stream_iterator =
+    config.adapter.streaming_chat_completion(
+      streaming_params,
+      types.OpenAIConfig("test", None),
+    )
+
   // Process streaming chunks for array
   process_array_stream(stream_iterator, validator, [])
 }
@@ -250,7 +262,8 @@ fn process_array_stream(
           // Validate the first complete item as the result
           case decode.run(item, validator) {
             Ok(result) -> Success(result)
-            Error(errors) -> ValidationError(list.map(errors, format_decode_error))
+            Error(errors) ->
+              ValidationError(list.map(errors, format_decode_error))
           }
         }
       }
@@ -258,7 +271,7 @@ fn process_array_stream(
     Ok(#(chunk, next_iterator)) -> {
       // Parse SSE events from chunk
       let events = sse_parser.parse_sse_stream(chunk)
-      
+
       // Extract new items from the stream
       let new_items = case events {
         [] -> []
@@ -269,7 +282,7 @@ fn process_array_stream(
           })
         }
       }
-      
+
       // Append new items and continue
       let updated = list.append(accumulated, new_items)
       process_array_stream(next_iterator, validator, updated)

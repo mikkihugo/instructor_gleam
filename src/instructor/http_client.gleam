@@ -103,16 +103,14 @@ pub fn add_common_headers(
   headers: List(#(String, String)),
   user_agent: String,
 ) -> List(#(String, String)) {
-  [
-    #("User-Agent", user_agent),
-    #("Accept", "application/json"),
-    ..headers
-  ]
+  [#("User-Agent", user_agent), #("Accept", "application/json"), ..headers]
 }
 
 /// Validate URL format
 pub fn validate_url(url: String) -> Result(String, String) {
-  case string.starts_with(url, "http://") || string.starts_with(url, "https://") {
+  case
+    string.starts_with(url, "http://") || string.starts_with(url, "https://")
+  {
     True -> Ok(url)
     False -> Error("URL must start with http:// or https://")
   }
@@ -133,12 +131,15 @@ pub fn build_api_url(base_url: String, endpoint: String) -> String {
 
 /// Parse content-type header
 pub fn parse_content_type(headers: List(#(String, String))) -> String {
-  case list.find(headers, fn(header) {
-    let #(name, _) = header
-    string.lowercase(name) == "content-type"
-  }) {
+  case
+    list.find(headers, fn(header) {
+      let #(name, _) = header
+      string.lowercase(name) == "content-type"
+    })
+  {
     Ok(#(_, content_type)) -> content_type
-    Error(_) -> "application/json" // Default
+    Error(_) -> "application/json"
+    // Default
   }
 }
 
@@ -151,6 +152,6 @@ pub fn is_json_response(headers: List(#(String, String))) -> Bool {
 /// Check if response is streaming
 pub fn is_streaming_response(headers: List(#(String, String))) -> Bool {
   let content_type = parse_content_type(headers)
-  string.contains(content_type, "text/stream") || 
-  string.contains(content_type, "text/event-stream")
+  string.contains(content_type, "text/stream")
+  || string.contains(content_type, "text/event-stream")
 }

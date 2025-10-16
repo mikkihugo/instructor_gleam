@@ -6,8 +6,8 @@ import gleam/option.{None, Some}
 import gleam/string
 import instructor/adapter
 import instructor/types.{
-  type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  type HttpResponse, OllamaConfig, Tools, Json, JsonSchema, MdJson,
+  type AdapterConfig, type ChatParams, type HttpResponse, type Message,
+  type ResponseMode, Json, JsonSchema, MdJson, OllamaConfig, Tools,
   messages_to_json,
 }
 
@@ -22,16 +22,19 @@ pub fn ollama_adapter() -> adapter.Adapter(String) {
 }
 
 /// Ollama chat completion implementation
-fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(String, String) {
+fn ollama_chat_completion(
+  params: ChatParams,
+  config: AdapterConfig,
+) -> Result(String, String) {
   case config {
     OllamaConfig(base_url) -> {
       let url = base_url <> "/api/chat"
-      
+
       let request_body = build_ollama_request(params)
       let headers = [
         #("Content-Type", "application/json"),
       ]
-      
+
       let request =
         types.HttpRequest(
           method: Post,
@@ -39,7 +42,7 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
           headers: headers,
           body: json.to_string(request_body),
         )
-      
+
       case adapter.make_request(request) {
         Ok(response) -> extract_ollama_response(response, params.mode)
         Error(err) -> Error("HTTP request failed: " <> err)
@@ -50,13 +53,20 @@ fn ollama_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(S
 }
 
 /// Ollama streaming chat completion
-fn ollama_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn ollama_streaming_chat_completion(
+  params: ChatParams,
+  config: AdapterConfig,
+) -> adapter.Iterator(String) {
   case config {
     OllamaConfig(base_url) -> {
       // Simulate Ollama streaming response format (NDJSON)
       adapter.streaming_iterator([
-        "{\"model\":\"" <> params.model <> "\",\"message\":{\"content\":\"partial\"}}\n",
-        "{\"model\":\"" <> params.model <> "\",\"message\":{\"content\":\" response\"}}\n",
+        "{\"model\":\""
+          <> params.model
+          <> "\",\"message\":{\"content\":\"partial\"}}\n",
+        "{\"model\":\""
+          <> params.model
+          <> "\",\"message\":{\"content\":\" response\"}}\n",
         "{\"done\":true}\n",
       ])
     }
@@ -65,7 +75,11 @@ fn ollama_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -
 }
 
 /// Ollama reask messages implementation
-fn ollama_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
+fn ollama_reask_messages(
+  response: String,
+  _params: ChatParams,
+  _config: AdapterConfig,
+) -> List(Message) {
   [types.Message(types.Assistant, response)]
 }
 
@@ -76,47 +90,59 @@ fn build_ollama_request(params: ChatParams) -> json.Json {
     #("messages", messages_to_json(params.messages)),
     #("stream", json.bool(params.stream)),
   ]
-  
+
   let with_temperature = case params.temperature {
     Some(temp) -> [
-      #("options", json.object([
-        #("temperature", json.float(temp)),
-      ])),
+      #(
+        "options",
+        json.object([
+          #("temperature", json.float(temp)),
+        ]),
+      ),
       ..base_fields
     ]
     None -> base_fields
   }
-  
+
   let final_fields = case params.mode {
     Tools -> add_ollama_tools_params(with_temperature)
     Json | JsonSchema -> add_ollama_json_params(with_temperature)
     MdJson -> add_ollama_md_json_params(with_temperature)
   }
-  
+
   json.object(final_fields)
 }
 
 /// Add tools parameters for Ollama (using function calling if supported)
-fn add_ollama_tools_params(fields: List(#(String, json.Json))) -> List(#(String, json.Json)) {
+fn add_ollama_tools_params(
+  fields: List(#(String, json.Json)),
+) -> List(#(String, json.Json)) {
   // Ollama may not support function calling on all models
   // Fall back to JSON mode with instructions
   add_ollama_json_params(fields)
 }
 
 /// Add JSON mode parameters for Ollama
-fn add_ollama_json_params(fields: List(#(String, json.Json))) -> List(#(String, json.Json)) {
+fn add_ollama_json_params(
+  fields: List(#(String, json.Json)),
+) -> List(#(String, json.Json)) {
   // Ollama supports JSON format parameter
   [#("format", json.string("json")), ..fields]
 }
 
 /// Add markdown JSON parameters for Ollama
-fn add_ollama_md_json_params(fields: List(#(String, json.Json))) -> List(#(String, json.Json)) {
+fn add_ollama_md_json_params(
+  fields: List(#(String, json.Json)),
+) -> List(#(String, json.Json)) {
   // No special format, rely on prompt engineering
   fields
 }
 
 /// Extract response from Ollama API response
-fn extract_ollama_response(response: HttpResponse, mode: ResponseMode) -> Result(String, String) {
+fn extract_ollama_response(
+  response: HttpResponse,
+  mode: ResponseMode,
+) -> Result(String, String) {
   case response.status {
     200 -> {
       case mode {
@@ -124,7 +150,13 @@ fn extract_ollama_response(response: HttpResponse, mode: ResponseMode) -> Result
         MdJson -> extract_ollama_md_json_response(response.body)
       }
     }
-    _ -> Error("Ollama API error: " <> string.inspect(response.status) <> " - " <> response.body)
+    _ ->
+      Error(
+        "Ollama API error: "
+        <> string.inspect(response.status)
+        <> " - "
+        <> response.body,
+      )
   }
 }
 
@@ -180,7 +212,7 @@ fn extract_json_from_markdown(content: String) -> Result(String, String) {
 pub fn list_ollama_models(base_url: String) -> Result(List(String), String) {
   let url = base_url <> "/api/tags"
   let headers = [#("Content-Type", "application/json")]
-  
+
   let request =
     types.HttpRequest(method: Get, url: url, headers: headers, body: "")
 
@@ -201,7 +233,8 @@ fn parse_ollama_models(body: String) -> Result(List(String), String) {
   case json.parse(body, using: decode.dynamic) {
     Ok(_parsed) -> {
       // Would need proper JSON decoding to extract model names
-      Ok(["llama2", "codellama", "mistral"]) // Placeholder
+      Ok(["llama2", "codellama", "mistral"])
+      // Placeholder
     }
     Error(_) -> Error("Failed to parse models response")
   }

@@ -156,7 +156,8 @@ pub fn supports_function_calling(config: Config) -> Bool {
     types.OpenAIConfig(_, _) -> True
     types.AnthropicConfig(_, _) -> True
     types.GeminiConfig(_, _) -> True
-    types.OllamaConfig(_) -> False // Most Ollama models don't support function calling
+    types.OllamaConfig(_) -> False
+    // Most Ollama models don't support function calling
     _ -> False
   }
 }
@@ -166,27 +167,27 @@ pub fn get_recommended_models(config: Config) -> List(String) {
   case config.default_adapter {
     types.OpenAIConfig(_, _) -> [
       "gpt-4o",
-      "gpt-4o-mini", 
+      "gpt-4o-mini",
       "gpt-4-turbo",
-      "gpt-3.5-turbo"
+      "gpt-3.5-turbo",
     ]
     types.AnthropicConfig(_, _) -> [
       "claude-3-5-sonnet-20241022",
       "claude-3-opus-20240229",
       "claude-3-sonnet-20240229",
-      "claude-3-haiku-20240307"
+      "claude-3-haiku-20240307",
     ]
     types.GeminiConfig(_, _) -> [
       "gemini-1.5-pro",
       "gemini-1.5-flash",
-      "gemini-pro"
+      "gemini-pro",
     ]
     types.OllamaConfig(_) -> [
       "llama2",
       "llama2:13b",
       "codellama",
       "mistral",
-      "neural-chat"
+      "neural-chat",
     ]
     _ -> []
   }

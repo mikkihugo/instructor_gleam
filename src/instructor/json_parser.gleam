@@ -2,7 +2,7 @@ import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/json
 import gleam/list
-import gleam/option.{type Option, Some, None}
+import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
@@ -15,12 +15,7 @@ fn option_to_list(opt: Option(a)) -> List(a) {
 
 /// JSON streaming parser state
 pub type ParserState {
-  ParserState(
-    buffer: String,
-    depth: Int,
-    in_string: Bool,
-    escaped: Bool,
-  )
+  ParserState(buffer: String, depth: Int, in_string: Bool, escaped: Bool)
 }
 
 /// Initialize parser state
@@ -29,7 +24,10 @@ pub fn init_parser() -> ParserState {
 }
 
 /// Parse incremental JSON chunks
-pub fn parse_chunk(state: ParserState, chunk: String) -> #(ParserState, List(String)) {
+pub fn parse_chunk(
+  state: ParserState,
+  chunk: String,
+) -> #(ParserState, List(String)) {
   parse_chars(state, string.to_graphemes(chunk), [])
 }
 
@@ -46,12 +44,8 @@ fn parse_chars(
       case is_complete_object(new_state) {
         True -> {
           let completed_json = new_state.buffer
-          let reset_state = ParserState(
-            buffer: "",
-            depth: 0,
-            in_string: False,
-            escaped: False,
-          )
+          let reset_state =
+            ParserState(buffer: "", depth: 0, in_string: False, escaped: False)
           parse_chars(reset_state, rest, [completed_json, ..completed])
         }
         False -> parse_chars(new_state, rest, completed)
@@ -63,39 +57,24 @@ fn parse_chars(
 /// Process a single character
 fn process_char(state: ParserState, char: String) -> ParserState {
   let updated_buffer = state.buffer <> char
-  
+
   case state.escaped {
-    True -> ParserState(
-      ..state,
-      buffer: updated_buffer,
-      escaped: False,
-    )
+    True -> ParserState(..state, buffer: updated_buffer, escaped: False)
     False -> {
       case char {
-        "\\" if state.in_string -> ParserState(
-          ..state,
-          buffer: updated_buffer,
-          escaped: True,
-        )
-        "\"" -> ParserState(
-          ..state,
-          buffer: updated_buffer,
-          in_string: !state.in_string,
-        )
-        "{" if !state.in_string -> ParserState(
-          ..state,
-          buffer: updated_buffer,
-          depth: state.depth + 1,
-        )
-        "}" if !state.in_string -> ParserState(
-          ..state,
-          buffer: updated_buffer,
-          depth: state.depth - 1,
-        )
-        _ -> ParserState(
-          ..state,
-          buffer: updated_buffer,
-        )
+        "\\" if state.in_string ->
+          ParserState(..state, buffer: updated_buffer, escaped: True)
+        "\"" ->
+          ParserState(
+            ..state,
+            buffer: updated_buffer,
+            in_string: !state.in_string,
+          )
+        "{" if !state.in_string ->
+          ParserState(..state, buffer: updated_buffer, depth: state.depth + 1)
+        "}" if !state.in_string ->
+          ParserState(..state, buffer: updated_buffer, depth: state.depth - 1)
+        _ -> ParserState(..state, buffer: updated_buffer)
       }
     }
   }
@@ -141,8 +120,10 @@ pub fn merge_partial_objects(
   // This is a simplified merge - in a real implementation,
   // we'd need more sophisticated object merging
   case decode.run(update, decode.dict(decode.string, decode.dynamic)) {
-    Ok(_) -> update // If update is valid, use it
-    Error(_) -> base // Otherwise keep base
+    Ok(_) -> update
+    // If update is valid, use it
+    Error(_) -> base
+    // Otherwise keep base
   }
 }
 

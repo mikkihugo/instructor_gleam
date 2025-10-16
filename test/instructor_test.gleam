@@ -1,10 +1,10 @@
+import gleam/dynamic
+import gleam/option.{Some}
 import gleeunit
 import gleeunit/should
-import gleam/dynamic
 import instructor
-import instructor/types
 import instructor/json_schema
-import gleam/option.{Some}
+import instructor/types
 
 pub fn main() {
   gleeunit.main()
@@ -14,13 +14,13 @@ pub fn main() {
 pub fn role_conversion_test() {
   types.role_to_string(types.User)
   |> should.equal("user")
-  
+
   types.role_to_string(types.Assistant)
   |> should.equal("assistant")
-  
+
   types.string_to_role("system")
   |> should.equal(Ok(types.System))
-  
+
   types.string_to_role("invalid")
   |> should.equal(Error(Nil))
 }
@@ -40,7 +40,7 @@ pub fn message_creation_test() {
 pub fn json_schema_test() {
   let schema = json_schema.string_schema(Some("A test string"))
   let json_str = json_schema.schema_to_string(schema)
-  
+
   // Just check that it produces a string
   json_str
   |> should.not_equal("")

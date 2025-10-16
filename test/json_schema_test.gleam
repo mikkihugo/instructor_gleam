@@ -1,9 +1,9 @@
-import gleeunit
-import gleeunit/should
 import gleam/dict
-import instructor/json_schema
 import gleam/option.{Some}
 import gleam/string
+import gleeunit
+import gleeunit/should
+import instructor/json_schema
 
 pub fn main() {
   gleeunit.main()

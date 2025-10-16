@@ -16,11 +16,7 @@ pub type HttpRequest {
 
 /// HTTP response
 pub type HttpResponse {
-  HttpResponse(
-    status: Int,
-    headers: List(#(String, String)),
-    body: String,
-  )
+  HttpResponse(status: Int, headers: List(#(String, String)), body: String)
 }
 
 /// Response modes for LLM interactions

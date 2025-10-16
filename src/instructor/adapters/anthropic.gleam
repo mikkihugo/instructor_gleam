@@ -5,8 +5,8 @@ import gleam/option.{None, Some}
 import gleam/string
 import instructor/adapter
 import instructor/types.{
-  type AdapterConfig, type ChatParams, type Message, type ResponseMode,
-  type HttpResponse, AnthropicConfig, Tools, Json, JsonSchema, MdJson,
+  type AdapterConfig, type ChatParams, type HttpResponse, type Message,
+  type ResponseMode, AnthropicConfig, Json, JsonSchema, MdJson, Tools,
 }
 
 /// Anthropic adapter implementation
@@ -20,21 +20,24 @@ pub fn anthropic_adapter() -> adapter.Adapter(String) {
 }
 
 /// Anthropic chat completion implementation
-fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Result(String, String) {
+fn anthropic_chat_completion(
+  params: ChatParams,
+  config: AdapterConfig,
+) -> Result(String, String) {
   case config {
     AnthropicConfig(api_key, base_url) -> {
       let url = case base_url {
         Some(base) -> base <> "/messages"
         None -> "https://api.anthropic.com/v1/messages"
       }
-      
+
       let request_body = build_anthropic_request(params)
       let headers = [
         #("x-api-key", api_key),
         #("Content-Type", "application/json"),
         #("anthropic-version", "2023-06-01"),
       ]
-      
+
       let request =
         types.HttpRequest(
           method: Post,
@@ -42,7 +45,7 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
           headers: headers,
           body: json.to_string(request_body),
         )
-      
+
       case adapter.make_request(request) {
         Ok(response) -> extract_anthropic_response(response, params.mode)
         Error(err) -> Error("HTTP request failed: " <> err)
@@ -53,7 +56,10 @@ fn anthropic_chat_completion(params: ChatParams, config: AdapterConfig) -> Resul
 }
 
 /// Anthropic streaming chat completion
-fn anthropic_streaming_chat_completion(params: ChatParams, config: AdapterConfig) -> adapter.Iterator(String) {
+fn anthropic_streaming_chat_completion(
+  params: ChatParams,
+  config: AdapterConfig,
+) -> adapter.Iterator(String) {
   case config {
     AnthropicConfig(api_key, base_url) -> {
       // Simulate Anthropic streaming response format
@@ -71,7 +77,11 @@ fn anthropic_streaming_chat_completion(params: ChatParams, config: AdapterConfig
 }
 
 /// Anthropic reask messages implementation
-fn anthropic_reask_messages(response: String, _params: ChatParams, _config: AdapterConfig) -> List(Message) {
+fn anthropic_reask_messages(
+  response: String,
+  _params: ChatParams,
+  _config: AdapterConfig,
+) -> List(Message) {
   [types.Message(types.Assistant, response)]
 }
 
@@ -79,27 +89,29 @@ fn anthropic_reask_messages(response: String, _params: ChatParams, _config: Adap
 fn build_anthropic_request(params: ChatParams) -> json.Json {
   // Convert messages to Anthropic format
   let anthropic_messages = convert_messages_to_anthropic(params.messages)
-  
+
   let base_fields = [
     #("model", json.string(params.model)),
     #("messages", json.array(anthropic_messages, fn(x) { x })),
   ]
-  
+
   let with_max_tokens = case params.max_tokens {
     Some(tokens) -> [#("max_tokens", json.int(tokens)), ..base_fields]
-    None -> [#("max_tokens", json.int(4096)), ..base_fields] // Default for Anthropic
+    None -> [#("max_tokens", json.int(4096)), ..base_fields]
+    // Default for Anthropic
   }
-  
+
   let with_temperature = case params.temperature {
     Some(temp) -> [#("temperature", json.float(temp)), ..with_max_tokens]
     None -> with_max_tokens
   }
-  
+
   let final_fields = case params.mode {
     Tools -> add_anthropic_tools_params(with_temperature)
-    Json | JsonSchema | MdJson -> add_anthropic_json_params(with_temperature, params.mode)
+    Json | JsonSchema | MdJson ->
+      add_anthropic_json_params(with_temperature, params.mode)
   }
-  
+
   json.object(final_fields)
 }
 
@@ -115,7 +127,9 @@ fn convert_messages_to_anthropic(messages: List(Message)) -> List(json.Json) {
 }
 
 /// Split system messages from other messages
-fn split_system_messages(messages: List(Message)) -> #(List(Message), List(Message)) {
+fn split_system_messages(
+  messages: List(Message),
+) -> #(List(Message), List(Message)) {
   list.partition(messages, fn(msg) {
     case msg {
       types.Message(types.System, _) -> True
@@ -127,14 +141,15 @@ fn split_system_messages(messages: List(Message)) -> #(List(Message), List(Messa
 /// Convert a message to Anthropic JSON format
 fn message_to_anthropic_json(message: Message) -> json.Json {
   let types.Message(role, content) = message
-  
+
   let anthropic_role = case role {
     types.User -> "user"
     types.Assistant -> "assistant"
-    types.System -> "user" // Anthropic doesn't have system role in messages
+    types.System -> "user"
+    // Anthropic doesn't have system role in messages
     types.Tool -> "user"
   }
-  
+
   json.object([
     #("role", json.string(anthropic_role)),
     #("content", json.string(content)),
@@ -142,18 +157,32 @@ fn message_to_anthropic_json(message: Message) -> json.Json {
 }
 
 /// Add tools parameters for Anthropic
-fn add_anthropic_tools_params(fields: List(#(String, json.Json))) -> List(#(String, json.Json)) {
-  let tools = json.array([
-    json.object([
-      #("name", json.string("extract_schema")),
-      #("description", json.string("Extract structured data according to the provided schema")),
-      #("input_schema", json.object([
-        #("type", json.string("object")),
-        #("properties", json.object([])),
-      ])),
-    ])
-  ], fn(x) { x })
-  
+fn add_anthropic_tools_params(
+  fields: List(#(String, json.Json)),
+) -> List(#(String, json.Json)) {
+  let tools =
+    json.array(
+      [
+        json.object([
+          #("name", json.string("extract_schema")),
+          #(
+            "description",
+            json.string(
+              "Extract structured data according to the provided schema",
+            ),
+          ),
+          #(
+            "input_schema",
+            json.object([
+              #("type", json.string("object")),
+              #("properties", json.object([])),
+            ]),
+          ),
+        ]),
+      ],
+      fn(x) { x },
+    )
+
   [#("tools", tools), ..fields]
 }
 
@@ -181,8 +210,10 @@ fn extract_anthropic_response(
     }
     _ ->
       Error(
-        "Anthropic API error: " <> string.inspect(response.status) <> " - "
-          <> response.body,
+        "Anthropic API error: "
+        <> string.inspect(response.status)
+        <> " - "
+        <> response.body,
       )
   }
 }
