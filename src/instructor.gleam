@@ -180,8 +180,11 @@ fn do_partial_chat_completion(
       types.OpenAIConfig("test", None),
     )
 
+  // Create an initial empty object as dynamic value by parsing empty JSON
+  let assert Ok(initial_value) = json.parse("{}", using: decode.dynamic)
+
   // Process streaming chunks
-  process_partial_stream(stream_iterator, validator, dynamic.from(Nil))
+  process_partial_stream(stream_iterator, validator, initial_value)
 }
 
 /// Process partial streaming responses

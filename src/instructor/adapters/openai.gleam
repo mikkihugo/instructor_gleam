@@ -60,26 +60,7 @@ fn openai_streaming_chat_completion(
   config: AdapterConfig,
 ) -> adapter.Iterator(String) {
   case config {
-    OpenAIConfig(api_key, base_url) -> {
-      let url = case base_url {
-        Some(base) -> base <> "/chat/completions"
-        None -> "https://api.openai.com/v1/chat/completions"
-      }
-
-      let request_body = build_openai_request(params)
-      let headers = [
-        #("Authorization", "Bearer " <> api_key),
-        #("Content-Type", "application/json"),
-      ]
-
-      let request =
-        types.HttpRequest(
-          method: Post,
-          url: url,
-          headers: headers,
-          body: json.to_string(request_body),
-        )
-
+    OpenAIConfig(_api_key, _base_url) -> {
       // For now, simulate streaming with mock data
       // In a real implementation, this would make an actual streaming HTTP request
       // and return chunks as they arrive
