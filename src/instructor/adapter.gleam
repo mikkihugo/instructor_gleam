@@ -1,8 +1,27 @@
+//// Adapter pattern for LLM providers
+////
+//// This module defines the adapter interface that all LLM providers implement.
+//// It provides a consistent way to interact with different LLM providers
+//// (OpenAI, Anthropic, Gemini, Groq, Ollama, etc.) through a unified interface.
+////
+//// ## Example
+////
+//// ```gleam
+//// import instructor/adapter
+//// import instructor/adapters/openai
+////
+//// let openai = openai.openai_adapter()
+//// // Use the adapter for chat completion
+//// ```
+
 import gleam/list
 import instructor/http_client
 import instructor/types.{type AdapterConfig, type ChatParams}
 
 /// Adapter behavior for LLM providers
+/// 
+/// An adapter encapsulates the logic for communicating with a specific LLM provider,
+/// including request formatting, response parsing, and error handling.
 pub type Adapter(a) {
   Adapter(
     name: String,

@@ -1,3 +1,9 @@
+//// HTTP client utilities for making API requests
+////
+//// This module provides a thin wrapper around gleam_httpc for making HTTP requests
+//// to LLM provider APIs. It handles request construction, header management,
+//// and error formatting.
+
 import gleam/http/request
 import gleam/httpc
 import gleam/list
@@ -5,6 +11,9 @@ import gleam/string
 import instructor/types.{type HttpRequest, type HttpResponse, HttpResponse}
 
 /// Make an HTTP request using gleam_httpc
+/// 
+/// Takes a simplified HttpRequest and executes it using the gleam_httpc library.
+/// Returns either a successful HttpResponse or an error message.
 pub fn make_http_request(req: HttpRequest) -> Result(HttpResponse, String) {
   // Create the HTTP request
   case request.to(req.url) {
