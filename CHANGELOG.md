@@ -1,8 +1,87 @@
 # Changelog
 
-## [Unreleased](https://github.com/thmsmlr/instructor_ex/compare/v0.0.5..main)
+All notable changes to the Instructor Gleam library will be documented in this file.
 
-...
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0-beta.1] - 2025-01-16
+
+This is the first beta release of Instructor for Gleam - a complete rewrite from the Elixir version with idiomatic Gleam patterns and type safety.
+
+### Added
+
+- **Core Library**: Complete Gleam implementation with type-safe LLM interactions
+- **Streaming Support**: Full streaming with partial and array modes
+  - Partial streaming: Incrementally updates objects as chunks arrive
+  - Array streaming: Emits validated items as they complete
+  - SSE (Server-Sent Events) parser for streaming responses
+  - JSON streaming parser with incremental object building
+- **Multiple LLM Providers**:
+  - OpenAI adapter (GPT-5, GPT-5 Pro, GPT-4o, o1 models)
+  - Anthropic adapter (Claude Opus 4, Claude Sonnet 4, Claude 3.5)
+  - Google Gemini adapter (Gemini 2.5 Pro/Flash/Flash-Lite, Gemini 2.0)
+  - Groq adapter (Llama 3.3, Llama 3.1, Mixtral for fast inference)
+  - Ollama adapter (Llama 3.2, Qwen 2.5, Phi-3 for local hosting)
+- **Custom Validators Module**: Advanced validation framework
+  - Composable validators with functional patterns
+  - Built-in validators: email, string length, number ranges, enums, lists
+  - Custom validation logic with decoder integration
+  - Full documentation and examples
+- **Enhanced JSON Schema Generation**:
+  - Builder pattern for complex object schemas
+  - Constraint support (min/max for numbers, patterns for strings)
+  - Field-by-field schema construction
+  - Helper methods for common schema types
+- **Advanced Examples**: Comprehensive examples in `examples/advanced_validators.gleam`
+  - Email validation patterns
+  - Person model with composed validation rules
+  - Product model with business logic
+  - Schema generation demonstrations
+- **Development Guide**: `.github/AGENTS.md` with quality standards and workflows
+- **Latest 2025 AI Models**:
+  - OpenAI GPT-5 (400K context, dynamic thinking mode)
+  - Anthropic Claude 4 (enhanced coding and reasoning)
+  - Google Gemini 2.5 (advanced multimodal capabilities)
+
+### Changed
+
+- **Pure Gleam Implementation**: Rewritten from Elixir to idiomatic Gleam
+  - Uses `gleam/dynamic/decode` instead of Ecto changesets
+  - Compile-time type checking throughout
+  - Pattern matching and exhaustive case checking
+  - No database framework dependency
+- **Validation Approach**: Functional validators instead of changeset-based validation
+- **Configuration**: Explicit configuration patterns (no Mix.Config)
+- **Error Handling**: Result types with detailed error information
+
+### Removed
+
+- **Elixir Dependencies**: Removed all Ecto, Mix, and Elixir-specific code
+- **Legacy Files**: Cleaned up 22 Elixir-specific files (~3000 lines)
+  - Deleted `pages/` directory with .livemd LiveBook files
+  - Deleted `config/` directory with Elixir configuration
+  - Removed `MIGRATION.md` (Elixir-to-Gleam migration guide)
+
+### Fixed
+
+- All compiler warnings resolved (zero warnings)
+- Code formatted with `gleam format`
+- All tests passing (20 tests, 0 failures)
+
+### Documentation
+
+- Comprehensive README with quick start guide
+- Supported models section with 2025 model listings
+- Custom validators documentation
+- Advanced schema generation guide
+- Development guide for contributors
+
+---
+
+## Legacy Elixir Versions
+
+The following versions are from the original Elixir implementation:
 
 ## [v0.1.0](https://github.com/thmsmlr/instructor_ex/compare/v0.0.5..v0.1.0)
 

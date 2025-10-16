@@ -76,7 +76,7 @@ pub fn split_sse_events(text: String) -> List(List(String)) {
   text
   |> string.split("\n\n")
   |> list.map(string.split(_, "\n"))
-  |> list.filter(fn(lines) { 
+  |> list.filter(fn(lines) {
     case lines {
       [""] -> False
       [] -> False

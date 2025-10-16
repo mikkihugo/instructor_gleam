@@ -1,0 +1,23 @@
+# HexDocs Configuration
+
+# This file is used to configure the documentation published to HexDocs
+
+[package]
+name = "instructor"
+version = "1.0.0"
+
+[docs]
+# Main documentation page
+main = "README.md"
+
+# Logo for documentation (optional - add if you have one)
+# logo = "logo.png"
+
+# Additional pages to include
+# extras = [
+#   "README.md",
+#   "CHANGELOG.md",
+# ]
+
+# Source URL pattern for "View Source" links
+# source_url_pattern = "https://github.com/mikkihugo/instructor_gleam/blob/v{version}/{path}#L{line}"

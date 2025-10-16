@@ -1,3 +1,4 @@
+import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/json
 import gleam/list
@@ -5,13 +6,16 @@ import gleam/option.{type Option, None, Some}
 import gleam/string
 import instructor/adapter.{type Adapter}
 import instructor/adapters/openai
+import instructor/json_parser
+import instructor/sse_parser
 import instructor/types.{
   type ChatParams, type LLMResult, type Message, type ResponseMode,
-  type ValidationContext, ChatParams, Success, ValidationError, AdapterError,
-  Tools,
+  type ValidationContext, AdapterError, ChatParams, Success, Tools,
+  ValidationError,
 }
 
-pub type Validator(a) = decode.Decoder(a)
+pub type Validator(a) =
+  decode.Decoder(a)
 
 /// Main Instructor configuration
 pub type InstructorConfig {
@@ -57,32 +61,33 @@ pub fn chat_completion(
     Some(m) -> m
     None -> config.default_model
   }
-  
+
   let actual_mode = case mode {
     Some(m) -> m
     None -> Tools
   }
-  
+
   let actual_max_retries = case max_retries {
     Some(r) -> r
     None -> config.default_max_retries
   }
-  
+
   let actual_validation_context = case validation_context {
     Some(ctx) -> ctx
     None -> []
   }
-  
-  let params = ChatParams(
-    model: actual_model,
-    messages: messages,
-    temperature: temperature,
-    max_tokens: max_tokens,
-    stream: False,
-    mode: actual_mode,
-    max_retries: actual_max_retries,
-    validation_context: actual_validation_context,
-  )
+
+  let params =
+    ChatParams(
+      model: actual_model,
+      messages: messages,
+      temperature: temperature,
+      max_tokens: max_tokens,
+      stream: False,
+      mode: actual_mode,
+      max_retries: actual_max_retries,
+      validation_context: actual_validation_context,
+    )
 
   case response_model {
     Single(validator) -> do_single_chat_completion(config, params, validator)
@@ -93,7 +98,12 @@ pub fn chat_completion(
 
 fn format_decode_error(error: decode.DecodeError) -> String {
   let path = string.join(error.path, ".")
-  "Expected " <> error.expected <> " but found " <> error.found <> " at path " <> path
+  "Expected "
+  <> error.expected
+  <> " but found "
+  <> error.found
+  <> " at path "
+  <> path
 }
 
 /// Execute single chat completion
@@ -102,7 +112,9 @@ fn do_single_chat_completion(
   params: ChatParams,
   validator: Validator(a),
 ) -> LLMResult(a) {
-  case config.adapter.chat_completion(params, types.OpenAIConfig("test", None)) {
+  case
+    config.adapter.chat_completion(params, types.OpenAIConfig("test", None))
+  {
     Ok(response) -> {
       case json.parse(response, using: validator) {
         Ok(validated_data) -> Success(validated_data)
@@ -152,24 +164,133 @@ fn retry_with_errors(
   do_single_chat_completion(config, updated_params, validator)
 }
 
-/// Execute partial streaming chat completion (placeholder)
+/// Execute partial streaming chat completion
 fn do_partial_chat_completion(
   config: InstructorConfig,
   params: ChatParams,
   validator: Validator(a),
 ) -> LLMResult(a) {
-  // For now, delegate to single completion
-  do_single_chat_completion(config, params, validator)
+  // Enable streaming in params
+  let streaming_params = ChatParams(..params, stream: True)
+
+  // Get streaming iterator from adapter
+  let stream_iterator =
+    config.adapter.streaming_chat_completion(
+      streaming_params,
+      types.OpenAIConfig("test", None),
+    )
+
+  // Create an initial empty object as dynamic value by parsing empty JSON
+  let assert Ok(initial_value) = json.parse("{}", using: decode.dynamic)
+
+  // Process streaming chunks
+  process_partial_stream(stream_iterator, validator, initial_value)
 }
 
-/// Execute array streaming chat completion (placeholder)
+/// Process partial streaming responses
+fn process_partial_stream(
+  iterator: adapter.Iterator(String),
+  validator: Validator(a),
+  previous: dynamic.Dynamic,
+) -> LLMResult(a) {
+  case iterator.next() {
+    Error(Nil) -> {
+      // Stream ended, validate the final result
+      case decode.run(previous, validator) {
+        Ok(result) -> Success(result)
+        Error(errors) -> ValidationError(list.map(errors, format_decode_error))
+      }
+    }
+    Ok(#(chunk, next_iterator)) -> {
+      // Parse SSE events from chunk
+      let events = sse_parser.parse_sse_stream(chunk)
+
+      // Extract and merge JSON data
+      let updated = case events {
+        [] -> previous
+        _ -> {
+          let data_events = sse_parser.extract_data_events(events)
+          case data_events {
+            [] -> previous
+            [first, ..] -> {
+              // Parse the JSON and merge with previous
+              case json.parse(first, using: decode.dynamic) {
+                Ok(parsed) ->
+                  json_parser.merge_partial_objects(previous, parsed)
+                Error(_) -> previous
+              }
+            }
+          }
+        }
+      }
+
+      // Continue processing stream
+      process_partial_stream(next_iterator, validator, updated)
+    }
+  }
+}
+
+/// Execute array streaming chat completion
 fn do_array_chat_completion(
   config: InstructorConfig,
   params: ChatParams,
   validator: Validator(a),
 ) -> LLMResult(a) {
-  // For now, delegate to single completion
-  do_single_chat_completion(config, params, validator)
+  // Enable streaming in params
+  let streaming_params = ChatParams(..params, stream: True)
+
+  // Get streaming iterator from adapter
+  let stream_iterator =
+    config.adapter.streaming_chat_completion(
+      streaming_params,
+      types.OpenAIConfig("test", None),
+    )
+
+  // Process streaming chunks for array
+  process_array_stream(stream_iterator, validator, [])
+}
+
+/// Process array streaming responses
+fn process_array_stream(
+  iterator: adapter.Iterator(String),
+  validator: Validator(a),
+  accumulated: List(dynamic.Dynamic),
+) -> LLMResult(a) {
+  case iterator.next() {
+    Error(Nil) -> {
+      // Stream ended, validate accumulated items
+      case accumulated {
+        [] -> ValidationError(["No items received from stream"])
+        [item, ..] -> {
+          // Validate the first complete item as the result
+          case decode.run(item, validator) {
+            Ok(result) -> Success(result)
+            Error(errors) ->
+              ValidationError(list.map(errors, format_decode_error))
+          }
+        }
+      }
+    }
+    Ok(#(chunk, next_iterator)) -> {
+      // Parse SSE events from chunk
+      let events = sse_parser.parse_sse_stream(chunk)
+
+      // Extract new items from the stream
+      let new_items = case events {
+        [] -> []
+        _ -> {
+          let data_events = sse_parser.extract_data_events(events)
+          list.flat_map(data_events, fn(data) {
+            json_parser.parse_partial_objects(data)
+          })
+        }
+      }
+
+      // Append new items and continue
+      let updated = list.append(accumulated, new_items)
+      process_array_stream(next_iterator, validator, updated)
+    }
+  }
 }
 
 /// Creates a user message.

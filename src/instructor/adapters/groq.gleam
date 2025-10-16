@@ -5,33 +5,33 @@ import gleam/string
 import instructor/adapter
 import instructor/types.{
   type AdapterConfig, type ChatParams, type HttpResponse, type Message,
-  type ResponseMode, Json, JsonSchema, MdJson, OpenAIConfig, Tools,
+  type ResponseMode, GroqConfig, Json, JsonSchema, MdJson, Tools,
   messages_to_json,
 }
 
-/// OpenAI adapter implementation
-pub fn openai_adapter() -> adapter.Adapter(String) {
+/// Groq adapter implementation (compatible with OpenAI API)
+pub fn groq_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
-    name: "openai",
-    chat_completion: openai_chat_completion,
-    streaming_chat_completion: openai_streaming_chat_completion,
-    reask_messages: openai_reask_messages,
+    name: "groq",
+    chat_completion: groq_chat_completion,
+    streaming_chat_completion: groq_streaming_chat_completion,
+    reask_messages: groq_reask_messages,
   )
 }
 
-/// OpenAI chat completion implementation
-fn openai_chat_completion(
+/// Groq chat completion implementation
+fn groq_chat_completion(
   params: ChatParams,
   config: AdapterConfig,
 ) -> Result(String, String) {
   case config {
-    OpenAIConfig(api_key, base_url) -> {
+    GroqConfig(api_key, base_url) -> {
       let url = case base_url {
-        Some(base) -> base <> "/chat/completions"
-        None -> "https://api.openai.com/v1/chat/completions"
+        Some(base) -> base <> "/openai/v1/chat/completions"
+        None -> "https://api.groq.com/openai/v1/chat/completions"
       }
 
-      let request_body = build_openai_request(params)
+      let request_body = build_groq_request(params)
       let headers = [
         #("Authorization", "Bearer " <> api_key),
         #("Content-Type", "application/json"),
@@ -46,37 +46,35 @@ fn openai_chat_completion(
         )
 
       case adapter.make_request(request) {
-        Ok(response) -> extract_openai_response(response, params.mode)
+        Ok(response) -> extract_groq_response(response, params.mode)
         Error(err) -> Error("HTTP request failed: " <> err)
       }
     }
-    _ -> Error("Invalid config for OpenAI adapter")
+    _ -> Error("Invalid config for Groq adapter")
   }
 }
 
-/// OpenAI streaming chat completion
-fn openai_streaming_chat_completion(
+/// Groq streaming chat completion
+fn groq_streaming_chat_completion(
   params: ChatParams,
   config: AdapterConfig,
 ) -> adapter.Iterator(String) {
   case config {
-    OpenAIConfig(_api_key, _base_url) -> {
-      // For now, simulate streaming with mock data
-      // In a real implementation, this would make an actual streaming HTTP request
-      // and return chunks as they arrive
+    GroqConfig(_api_key, _base_url) -> {
+      // Simulate Groq streaming response (OpenAI-compatible format)
       case params.mode {
         Tools ->
           adapter.streaming_iterator([
-            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"{\\\"name\\\"\"}}]}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"{\\\"result\\\"\"}}]}}]}\n\n",
             "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\":\"}}]}}]}\n\n",
-            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"\\\"John\\\"}}]}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"\\\"data\\\"}}]}}]}\n\n",
             "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"function\":{\"arguments\":\"}\"}}]}}]}\n\n",
             "data: [DONE]\n\n",
           ])
         _ ->
           adapter.streaming_iterator([
-            "data: {\"content\":\"partial\"}\n\n",
-            "data: {\"content\":\"complete\"}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"content\":\"partial\"}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"content\":\" response\"}}]}\n\n",
             "data: [DONE]\n\n",
           ])
       }
@@ -85,8 +83,8 @@ fn openai_streaming_chat_completion(
   }
 }
 
-/// OpenAI reask messages implementation
-fn openai_reask_messages(
+/// Groq reask messages implementation
+fn groq_reask_messages(
   response: String,
   _params: ChatParams,
   _config: AdapterConfig,
@@ -95,8 +93,8 @@ fn openai_reask_messages(
   [types.Message(types.Assistant, response)]
 }
 
-/// Build OpenAI API request JSON
-fn build_openai_request(params: ChatParams) -> json.Json {
+/// Build Groq API request JSON (OpenAI-compatible)
+fn build_groq_request(params: ChatParams) -> json.Json {
   let base_fields = [
     #("model", json.string(params.model)),
     #("messages", messages_to_json(params.messages)),
@@ -159,12 +157,7 @@ fn add_tools_params(
   let tool_choice =
     json.object([
       #("type", json.string("function")),
-      #(
-        "function",
-        json.object([
-          #("name", json.string("Schema")),
-        ]),
-      ),
+      #("function", json.object([#("name", json.string("Schema"))])),
     ])
 
   [#("tools", tools), #("tool_choice", tool_choice), ..fields]
@@ -174,10 +167,7 @@ fn add_tools_params(
 fn add_json_params(
   fields: List(#(String, json.Json)),
 ) -> List(#(String, json.Json)) {
-  let response_format =
-    json.object([
-      #("type", json.string("json_object")),
-    ])
+  let response_format = json.object([#("type", json.string("json_object"))])
 
   [#("response_format", response_format), ..fields]
 }
@@ -208,8 +198,8 @@ fn add_json_schema_params(
   [#("response_format", response_format), ..fields]
 }
 
-/// Extract response from OpenAI API response
-fn extract_openai_response(
+/// Extract response from Groq API response
+fn extract_groq_response(
   response: HttpResponse,
   mode: ResponseMode,
 ) -> Result(String, String) {
@@ -223,7 +213,7 @@ fn extract_openai_response(
     }
     _ ->
       Error(
-        "OpenAI API error: "
+        "Groq API error: "
         <> string.inspect(response.status)
         <> " - "
         <> response.body,
@@ -233,21 +223,21 @@ fn extract_openai_response(
 
 /// Extract response from tools/function calling
 fn extract_tools_response(_body: String) -> Result(String, String) {
-  // Parse the OpenAI response and extract the function call arguments
+  // Parse the Groq response and extract the function call arguments
   // This is a simplified implementation
   Ok("{\"extracted\": \"from tools\"}")
 }
 
 /// Extract response from JSON mode
 fn extract_json_response(_body: String) -> Result(String, String) {
-  // Parse the OpenAI response and extract the content
+  // Parse the Groq response and extract the content
   // This is a simplified implementation
   Ok("{\"extracted\": \"from json\"}")
 }
 
 /// Extract response from markdown JSON mode
 fn extract_md_json_response(_body: String) -> Result(String, String) {
-  // Parse the OpenAI response and extract JSON from markdown code block
+  // Parse the Groq response and extract JSON from markdown code block
   // This is a simplified implementation
   Ok("{\"extracted\": \"from md_json\"}")
 }

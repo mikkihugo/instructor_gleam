@@ -5,10 +5,41 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 ## Features
 
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
-- **Multiple LLM Providers**: Support for OpenAI, Anthropic, Gemini, Groq, Ollama, and more
+- **Multiple LLM Providers**: Support for OpenAI (GPT-5), Anthropic (Claude 4), Gemini (2.5), Groq, and Ollama
 - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
 - **Streaming Support**: Handle partial and array streaming responses
 - **Type Safe**: Full Gleam type safety for LLM interactions
+
+## Supported Models (2025)
+
+### OpenAI
+- **gpt-5** - Latest GPT-5 model (Aug 2025) with 400K context, dynamic thinking mode
+- **gpt-5-pro** - GPT-5 Pro variant for advanced tasks
+- **gpt-4o** - GPT-4 Omni model
+- **gpt-4o-mini** - Fast, cost-effective GPT-4 variant
+- **o1-preview** - Advanced reasoning model
+
+### Anthropic Claude 4
+- **claude-opus-4** - Most powerful Claude 4 model for complex coding and long-running tasks
+- **claude-sonnet-4** - Balanced performance with enhanced coding and reasoning (recommended)
+- **claude-3-5-sonnet-20241022** - Previous generation Claude 3.5
+- **claude-3-5-haiku-20241022** - Fast, efficient Claude 3.5
+
+### Google Gemini 2.5
+- **gemini-2.5-pro** - Most capable Gemini 2.5 for complex reasoning
+- **gemini-2.5-flash** - High performance with cost efficiency (recommended)
+- **gemini-2.5-flash-lite** - Lightweight, high-throughput variant
+- **gemini-2.0-flash-exp** - Experimental Gemini 2.0
+
+### Groq (Fast Inference)
+- **llama-3.3-70b-versatile** - Latest Llama 3.3
+- **llama-3.1-70b-versatile** - Llama 3.1 70B
+- **mixtral-8x7b-32768** - Mixtral MoE model
+
+### Ollama (Local)
+- **llama3.2** - Latest Llama 3.2
+- **qwen2.5** - Qwen 2.5 models
+- **mistral** - Mistral models
 
 ## Quick Start
 
@@ -59,6 +90,58 @@ let int_model = instructor.int_response_model("A number between 1-10")
 let bool_model = instructor.bool_response_model("True if positive sentiment")
 ```
 
+### Custom Validators
+
+For complex domain models, use custom validators with business logic:
+
+```gleam
+import instructor/validator
+
+pub type Person {
+  Person(name: String, age: Int, email: String)
+}
+
+pub fn person_validator() -> validator.CustomValidator(Person) {
+  let decoder = person_decoder()
+  let validation = validator.compose_validators([
+    validate_name,
+    validate_age, 
+    validate_email,
+  ])
+  validator.custom_validator(decoder, validation)
+}
+```
+
+See `examples/advanced_validators.gleam` for complete examples.
+
+### Advanced JSON Schema Generation
+
+Build sophisticated schemas with the schema builder:
+
+```gleam
+import instructor/json_schema
+
+let person_schema = 
+  json_schema.object_builder()
+  |> json_schema.add_string_field("name", "Person's name", True)
+  |> json_schema.add_int_field("age", "Person's age", True)
+  |> json_schema.add_enum_field("status", "Status", ["active", "inactive"], True)
+  |> json_schema.build_object(Some("Person information"))
+
+// With constraints
+let score_schema = json_schema.float_with_range(
+  Some("Confidence score"),
+  Some(0.0),
+  Some(1.0)
+)
+
+// With pattern validation
+let email_schema = json_schema.string_with_pattern(
+  Some("Email address"),
+  "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+)
+```
+
 ### Messages
 
 Create messages for conversation:
@@ -101,10 +184,12 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 - ✅ JSON schema generation
 - ✅ Validation using `gleam/dynamic/decode`
 - ✅ Adapter pattern for multiple LLMs
-- ✅ OpenAI, Anthropic, Gemini, and Ollama adapters
+- ✅ OpenAI, Anthropic, Gemini, Groq, and Ollama adapters
 - ✅ HTTP client implementation
 - ✅ Basic test suite
-- 🚧 Streaming support (basic implementation, needs more testing and features)
+- ✅ Streaming support (partial and array streaming modes)
+- ✅ Custom validators for complex domain models
+- ✅ Advanced JSON schema generation with builder pattern
 
 ## Installation
 
