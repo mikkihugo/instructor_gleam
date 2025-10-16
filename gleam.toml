@@ -1,8 +1,13 @@
 name = "instructor"
 version = "1.0.0"
-description = "Structured prompting for LLMs"
+description = "Structured prompting for Large Language Models with type-safe validation, streaming support, and multiple provider adapters (OpenAI GPT-5, Anthropic Claude 4, Gemini 2.5, Groq, Ollama)"
 licences = ["MIT"]
 repository = { type = "github", user = "mikkihugo", repo = "instructor_gleam" }
+
+links = [
+  { title = "Repository", href = "https://github.com/mikkihugo/instructor_gleam" },
+  { title = "Issues", href = "https://github.com/mikkihugo/instructor_gleam/issues" },
+]
 
 target = "erlang"
 
