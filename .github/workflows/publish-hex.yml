@@ -1,4 +1,6 @@
 name: Publish to Hex.pm
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:  # Allow manual triggering
