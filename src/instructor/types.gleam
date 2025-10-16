@@ -1,10 +1,16 @@
+//// Core type definitions for the Instructor library
+////
+//// This module contains all the fundamental types used throughout the library,
+//// including HTTP request/response types, LLM configuration types, message types,
+//// and result types.
+
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/http
 import gleam/json
 import gleam/option.{type Option}
 
-/// HTTP request configuration
+/// HTTP request configuration for making API calls
 pub type HttpRequest {
   HttpRequest(
     method: http.Method,

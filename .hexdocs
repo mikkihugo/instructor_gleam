@@ -13,11 +13,12 @@ main = "README.md"
 # Logo for documentation (optional - add if you have one)
 # logo = "logo.png"
 
-# Additional pages to include
-# extras = [
-#   "README.md",
-#   "CHANGELOG.md",
-# ]
+# Additional pages to include in documentation
+extras = [
+  "README.md",
+  "CHANGELOG.md",
+  "SECURITY.md",
+]
 
 # Source URL pattern for "View Source" links
-# source_url_pattern = "https://github.com/mikkihugo/instructor_gleam/blob/v{version}/{path}#L{line}"
+source_url_pattern = "https://github.com/mikkihugo/instructor_gleam/blob/v{version}/{path}#L{line}"

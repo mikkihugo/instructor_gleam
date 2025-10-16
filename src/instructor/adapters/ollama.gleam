@@ -1,3 +1,10 @@
+//// Ollama adapter implementation
+////
+//// This module provides the adapter implementation for Ollama's local LLM API.
+//// Ollama enables running open-source models locally, including Llama 3.2,
+//// Qwen 2.5, Mistral, and many others. This adapter handles request formatting
+//// and response parsing for Ollama's chat API.
+
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/http.{Get, Post}
@@ -12,6 +19,9 @@ import instructor/types.{
 }
 
 /// Ollama adapter implementation
+/// 
+/// Creates an adapter for communicating with a local Ollama instance.
+/// Supports all Ollama-compatible models including Llama, Qwen, Mistral, etc.
 pub fn ollama_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "ollama",
@@ -31,9 +41,7 @@ fn ollama_chat_completion(
       let url = base_url <> "/api/chat"
 
       let request_body = build_ollama_request(params)
-      let headers = [
-        #("Content-Type", "application/json"),
-      ]
+      let headers = [#("Content-Type", "application/json")]
 
       let request =
         types.HttpRequest(
@@ -93,12 +101,7 @@ fn build_ollama_request(params: ChatParams) -> json.Json {
 
   let with_temperature = case params.temperature {
     Some(temp) -> [
-      #(
-        "options",
-        json.object([
-          #("temperature", json.float(temp)),
-        ]),
-      ),
+      #("options", json.object([#("temperature", json.float(temp))])),
       ..base_fields
     ]
     None -> base_fields
