@@ -1,5 +1,10 @@
 # Instructor for Gleam
 
+[![Hex Package](https://img.shields.io/hexpm/v/instructor)](https://hex.pm/packages/instructor)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-blue)](https://hexdocs.pm/instructor/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/mikkihugo/instructor_gleam/actions/workflows/ci.yml/badge.svg)](https://github.com/mikkihugo/instructor_gleam/actions/workflows/ci.yml)
+
 Instructor is a Gleam library for structured prompting with Large Language Models. It converts LLM text outputs into validated data structures, enabling seamless integration between AI and traditional Gleam applications.
 
 ## Features
@@ -40,6 +45,15 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 - **llama3.2** - Latest Llama 3.2
 - **qwen2.5** - Qwen 2.5 models
 - **mistral** - Mistral models
+
+### Codex (ChatGPT OAuth - Subscription Only)
+- **codex-mini-latest** - Fast, 200K context, optimized for speed ($1.50/$6 per 1M tokens)
+- **gpt-5-codex** - Full quality, 272K context, better reasoning
+- **gpt-5** - General purpose, 272K context
+
+**Authentication**: Requires `~/.codex/auth.json` (run: `codex login`)
+**Reasoning Effort**: `minimal`, `low`, `medium`, `high` (thinking depth)
+**No Pay-Per-Token**: Subscription-based via ChatGPT Plus/Pro only
 
 ## Quick Start
 
@@ -168,13 +182,31 @@ Configure adapters in your application:
 
 ```gleam
 import instructor/types
+import instructor/adapters/openai
+import instructor/adapters/codex
 
-let config = instructor.InstructorConfig(
-  adapter: openai_adapter(),
-  default_model: "gpt-4o-mini", 
+// OpenAI (pay-per-token)
+let openai_config = instructor.InstructorConfig(
+  adapter: openai.openai_adapter(),
+  default_model: "gpt-4o-mini",
   default_max_retries: 3,
 )
+
+// Codex (ChatGPT OAuth - subscription only)
+case codex.codex_config_from_file(Some("medium"), False) {
+  Ok(codex_auth) -> {
+    let codex_config = instructor.InstructorConfig(
+      adapter: codex.codex_adapter(),
+      default_model: "codex-mini-latest",
+      default_max_retries: 2,
+    )
+    // Use codex_config for completions
+  }
+  Error(msg) -> io.println("Codex auth failed: " <> msg)
+}
 ```
+
+See `examples/codex_usage.gleam` for complete Codex examples including smart model selection and reasoning effort configuration.
 
 ## Development Status
 
@@ -184,7 +216,7 @@ This is a port of the Elixir Instructor library to Gleam. The current implementa
 - ✅ JSON schema generation
 - ✅ Validation using `gleam/dynamic/decode`
 - ✅ Adapter pattern for multiple LLMs
-- ✅ OpenAI, Anthropic, Gemini, Groq, and Ollama adapters
+- ✅ OpenAI, Anthropic, Gemini, Groq, Ollama, and Codex adapters
 - ✅ HTTP client implementation
 - ✅ Basic test suite
 - ✅ Streaming support (partial and array streaming modes)
@@ -209,4 +241,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+This library is inspired by the [Instructor](https://github.com/jxnl/instructor) library for Python and its Elixir port. Special thanks to the Gleam community for their excellent language and tooling.

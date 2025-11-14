@@ -20,3 +20,8 @@ elixir_backup/
 # Editor artifacts
 .vscode/
 .idea/
+
+# Development runtime artifacts
+.dev-db/
+.nats/
+ai-server/logs/
