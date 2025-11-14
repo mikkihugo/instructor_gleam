@@ -78,3 +78,69 @@ pub fn response_model_test() {
     _ -> should.fail()
   }
 }
+
+// Test int_response_model
+pub fn int_response_model_test() {
+  let model = instructor.int_response_model("Integer value")
+  case model {
+    instructor.Single(validator) -> {
+      let data = dynamic.int(42)
+      case decode.run(data, validator) {
+        Ok(result) -> result |> should.equal(42)
+        Error(_) -> should.fail()
+      }
+    }
+    _ -> should.fail()
+  }
+}
+
+// Test bool_response_model
+pub fn bool_response_model_test() {
+  let model = instructor.bool_response_model("Boolean value")
+  case model {
+    instructor.Single(validator) -> {
+      let data = dynamic.bool(True)
+      case decode.run(data, validator) {
+        Ok(result) -> result |> should.be_true()
+        Error(_) -> should.fail()
+      }
+    }
+    _ -> should.fail()
+  }
+}
+
+// Test system_message
+pub fn system_message_test() {
+  let msg = instructor.system_message("You are a helpful assistant")
+  case msg {
+    types.Message(role, content) -> {
+      role |> should.equal(types.System)
+      content |> should.equal("You are a helpful assistant")
+    }
+  }
+}
+
+// Test response model variants
+pub fn response_model_single_test() {
+  let model = instructor.Single(decode.string)
+  case model {
+    instructor.Single(_) -> True |> should.be_true()
+    _ -> should.fail()
+  }
+}
+
+pub fn response_model_partial_test() {
+  let model = instructor.Partial(decode.string)
+  case model {
+    instructor.Partial(_) -> True |> should.be_true()
+    _ -> should.fail()
+  }
+}
+
+pub fn response_model_array_test() {
+  let model = instructor.Array(decode.string)
+  case model {
+    instructor.Array(_) -> True |> should.be_true()
+    _ -> should.fail()
+  }
+}
