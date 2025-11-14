@@ -73,6 +73,12 @@ pub type AdapterConfig {
   OllamaConfig(base_url: String)
   LlamaCppConfig(base_url: String, chat_template: Option(String))
   VLLMConfig(base_url: String)
+  CodexOAuthConfig(
+    access_token: String,
+    account_id: Option(String),
+    reasoning_effort: Option(String),
+    reasoning_summary: Bool,
+  )
 }
 
 /// Parameters for chat completion
