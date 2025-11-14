@@ -3,6 +3,7 @@
 [![Hex Package](https://img.shields.io/hexpm/v/instructor)](https://hex.pm/packages/instructor)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-blue)](https://hexdocs.pm/instructor/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/mikkihugo/instructor_gleam/actions/workflows/ci.yml/badge.svg)](https://github.com/mikkihugo/instructor_gleam/actions/workflows/ci.yml)
 
 Instructor is a Gleam library for structured prompting with Large Language Models. It converts LLM text outputs into validated data structures, enabling seamless integration between AI and traditional Gleam applications.
 
