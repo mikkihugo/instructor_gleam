@@ -76,8 +76,7 @@ fn openai_streaming_chat_completion(
         _ ->
           adapter.streaming_iterator([
             "data: {\"content\":\"partial\"}\n\n",
-            "data: {\"content\":\"complete\"}\n\n",
-            "data: [DONE]\n\n",
+            "data: {\"content\":\"complete\"}\n\n", "data: [DONE]\n\n",
           ])
       }
     }
@@ -159,12 +158,7 @@ fn add_tools_params(
   let tool_choice =
     json.object([
       #("type", json.string("function")),
-      #(
-        "function",
-        json.object([
-          #("name", json.string("Schema")),
-        ]),
-      ),
+      #("function", json.object([#("name", json.string("Schema"))])),
     ])
 
   [#("tools", tools), #("tool_choice", tool_choice), ..fields]
@@ -174,10 +168,7 @@ fn add_tools_params(
 fn add_json_params(
   fields: List(#(String, json.Json)),
 ) -> List(#(String, json.Json)) {
-  let response_format =
-    json.object([
-      #("type", json.string("json_object")),
-    ])
+  let response_format = json.object([#("type", json.string("json_object"))])
 
   [#("response_format", response_format), ..fields]
 }

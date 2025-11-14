@@ -1,6 +1,6 @@
-name = "instructor_gleam"
-version = "1.1.0"
-description = "Structured prompting for Large Language Models with type-safe validation, streaming support, and multiple provider adapters (OpenAI GPT-5, Anthropic Claude 4, Gemini 2.5, Groq, Ollama, Codex)"
+name = "instructor"
+version = "1.2.0"
+description = "Structured prompting for Large Language Models with type-safe validation, streaming support, and multiple provider adapters (OpenAI GPT-5, Anthropic Claude 4, Gemini 2.5, Groq, Ollama)"
 licences = ["MIT"]
 repository = { type = "github", user = "mikkihugo", repo = "instructor_gleam" }
 

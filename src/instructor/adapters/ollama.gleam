@@ -31,9 +31,7 @@ fn ollama_chat_completion(
       let url = base_url <> "/api/chat"
 
       let request_body = build_ollama_request(params)
-      let headers = [
-        #("Content-Type", "application/json"),
-      ]
+      let headers = [#("Content-Type", "application/json")]
 
       let request =
         types.HttpRequest(
@@ -93,12 +91,7 @@ fn build_ollama_request(params: ChatParams) -> json.Json {
 
   let with_temperature = case params.temperature {
     Some(temp) -> [
-      #(
-        "options",
-        json.object([
-          #("temperature", json.float(temp)),
-        ]),
-      ),
+      #("options", json.object([#("temperature", json.float(temp))])),
       ..base_fields
     ]
     None -> base_fields

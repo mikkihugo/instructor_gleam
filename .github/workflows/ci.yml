@@ -10,28 +10,30 @@ on:
 
 jobs:
   test:
+    name: Test with Erlang/OTP ${{ matrix.otp }} and Gleam ${{ matrix.gleam }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ["27", "28"]
+        gleam: ["1.11", "1.12"]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: erlef/setup-beam@v1
+      - name: Set up Erlang and Gleam
+        uses: erlef/setup-beam@v1
         with:
-          otp-version: "28"
-          gleam-version: "1.12"
+          otp-version: ${{ matrix.otp }}
+          gleam-version: ${{ matrix.gleam }}
 
-      - run: gleam deps download
+      - name: Download dependencies
+        run: gleam deps download
 
-      - name: Auto format Gleam files
-        run: gleam format
+      - name: Check formatting
+        run: gleam format --check
 
-      - name: Commit formatting fixes (if any)
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [[ `git status --porcelain` ]]; then
-            git add .
-            git commit -m "chore: auto-format Gleam files"
-            git push
-          fi
+      - name: Run tests
+        run: gleam test
 
-      - run: gleam test
+      - name: Build project
+        run: gleam build

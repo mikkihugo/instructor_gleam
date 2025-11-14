@@ -41,9 +41,7 @@ fn gemini_chat_completion(
       }
 
       let request_body = build_gemini_request(params)
-      let headers = [
-        #("Content-Type", "application/json"),
-      ]
+      let headers = [#("Content-Type", "application/json")]
 
       let request =
         types.HttpRequest(
@@ -93,9 +91,7 @@ fn gemini_reask_messages(
 fn build_gemini_request(params: ChatParams) -> json.Json {
   let gemini_contents = convert_messages_to_gemini(params.messages)
 
-  let base_fields = [
-    #("contents", json.array(gemini_contents, fn(x) { x })),
-  ]
+  let base_fields = [#("contents", json.array(gemini_contents, fn(x) { x }))]
 
   let with_generation_config = case params.temperature, params.max_tokens {
     Some(temp), Some(max_tokens) -> [
@@ -109,20 +105,13 @@ fn build_gemini_request(params: ChatParams) -> json.Json {
       ..base_fields
     ]
     Some(temp), None -> [
-      #(
-        "generationConfig",
-        json.object([
-          #("temperature", json.float(temp)),
-        ]),
-      ),
+      #("generationConfig", json.object([#("temperature", json.float(temp))])),
       ..base_fields
     ]
     None, Some(max_tokens) -> [
       #(
         "generationConfig",
-        json.object([
-          #("maxOutputTokens", json.int(max_tokens)),
-        ]),
+        json.object([#("maxOutputTokens", json.int(max_tokens))]),
       ),
       ..base_fields
     ]
@@ -175,14 +164,7 @@ fn message_to_gemini_content(message: Message) -> json.Json {
     #("role", json.string(gemini_role)),
     #(
       "parts",
-      json.array(
-        [
-          json.object([
-            #("text", json.string(content)),
-          ]),
-        ],
-        fn(x) { x },
-      ),
+      json.array([json.object([#("text", json.string(content))])], fn(x) { x }),
     ),
   ])
 }
@@ -251,9 +233,7 @@ fn add_gemini_json_params(
     Json -> [
       #(
         "generationConfig",
-        json.object([
-          #("responseMimeType", json.string("application/json")),
-        ]),
+        json.object([#("responseMimeType", json.string("application/json"))]),
       ),
       ..fields
     ]
