@@ -90,7 +90,12 @@ fn codex_chat_completion(
   config: AdapterConfig,
 ) -> Result(String, String) {
   case config {
-    types.CodexOAuthConfig(access_token, account_id, reasoning_effort, reasoning_summary) -> {
+    types.CodexOAuthConfig(
+      access_token,
+      account_id,
+      reasoning_effort,
+      reasoning_summary,
+    ) -> {
       let url = "https://chatgpt.com/backend-api/codex/responses"
 
       let request_body =
@@ -100,13 +105,10 @@ fn codex_chat_completion(
         #("Authorization", "Bearer " <> access_token),
         #("Content-Type", "application/json"),
         #("OpenAI-Beta", "responses=experimental"),
-        #(
-          "chatgpt-account-id",
-          case account_id {
-            Some(id) -> id
-            None -> ""
-          },
-        ),
+        #("chatgpt-account-id", case account_id {
+          Some(id) -> id
+          None -> ""
+        }),
       ]
 
       let request =

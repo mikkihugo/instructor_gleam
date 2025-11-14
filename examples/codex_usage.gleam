@@ -102,12 +102,7 @@ pub fn smart_selection_example() {
     case codex.codex_config_from_file(Some(effort), False) {
       Ok(config) -> {
         io.println(
-          "\nTask: "
-          <> prompt
-          <> "\nModel: "
-          <> model
-          <> ", Effort: "
-          <> effort,
+          "\nTask: " <> prompt <> "\nModel: " <> model <> ", Effort: " <> effort,
         )
 
         let messages = [types.Message(User, prompt)]
@@ -127,7 +122,9 @@ pub fn smart_selection_example() {
 
         case result {
           types.Success(response) ->
-            io.println("✓ Got response: " <> string.slice(response, 0, 50) <> "...")
+            io.println(
+              "✓ Got response: " <> string.slice(response, 0, 50) <> "...",
+            )
           types.ValidationError(_) -> io.println("✗ Validation failed")
           types.AdapterError(_) -> io.println("✗ API error")
         }
