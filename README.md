@@ -210,7 +210,7 @@ See `examples/codex_usage.gleam` for complete Codex examples including smart mod
 
 ## Development Status
 
-This is a **production-ready release (v1.0.0)** of the Instructor library for Gleam. The implementation includes:
+This is a port of the Elixir Instructor library to Gleam. The current implementation includes:
 
 - ✅ Core types and data structures
 - ✅ JSON schema generation
@@ -218,12 +218,10 @@ This is a **production-ready release (v1.0.0)** of the Instructor library for Gl
 - ✅ Adapter pattern for multiple LLMs
 - ✅ OpenAI, Anthropic, Gemini, Groq, Ollama, and Codex adapters
 - ✅ HTTP client implementation
-- ✅ Comprehensive test suite
+- ✅ Basic test suite
 - ✅ Streaming support (partial and array streaming modes)
 - ✅ Custom validators for complex domain models
 - ✅ Advanced JSON schema generation with builder pattern
-- ✅ Full inline documentation
-- ✅ HexDocs published documentation
 
 ## Installation
 
@@ -231,35 +229,16 @@ Add to your `gleam.toml`:
 
 ```toml
 [dependencies]
-instructor = "~> 1.0"
+gleam_stdlib = "~> 0.34"
+gleam_http = "~> 4.1"
+gleam_httpc = "~> 5.0"
+gleam_json = "~> 3.0"
 ```
-
-Or install from the command line:
-
-```sh
-gleam add instructor
-```
-
-## API Documentation
-
-Full API documentation is available on [HexDocs](https://hexdocs.pm/instructor/).
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-### Development Setup
-
-1. Install Gleam (v1.11.0 or later)
-2. Clone the repository
-3. Install dependencies: `gleam deps download`
-4. Run tests: `gleam test`
-5. Format code: `gleam format`
 
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## Acknowledgments
+## Contributing
 
 This library is inspired by the [Instructor](https://github.com/jxnl/instructor) library for Python and its Elixir port. Special thanks to the Gleam community for their excellent language and tooling.

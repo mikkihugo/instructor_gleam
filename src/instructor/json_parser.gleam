@@ -1,9 +1,3 @@
-//// JSON parsing and streaming utilities
-////
-//// This module provides utilities for parsing JSON from streaming responses,
-//// including handling partial JSON objects and merging incremental updates.
-//// This is particularly useful for processing streaming LLM responses.
-
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/json
@@ -12,7 +6,6 @@ import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
-/// Convert an Option to a List for flat_map operations
 fn option_to_list(opt: Option(a)) -> List(a) {
   case opt {
     Some(x) -> [x]
@@ -20,7 +13,7 @@ fn option_to_list(opt: Option(a)) -> List(a) {
   }
 }
 
-/// JSON streaming parser state for incremental parsing
+/// JSON streaming parser state
 pub type ParserState {
   ParserState(buffer: String, depth: Int, in_string: Bool, escaped: Bool)
 }

@@ -1,10 +1,3 @@
-//// Google Gemini adapter implementation
-////
-//// This module provides the adapter implementation for Google's Gemini API,
-//// including Gemini 2.5 Pro, Gemini 2.5 Flash, and Gemini 2.0 models.
-//// It handles request formatting and response parsing for Gemini's
-//// generateContent API.
-
 import gleam/http.{Post}
 import gleam/json
 import gleam/list
@@ -17,9 +10,6 @@ import instructor/types.{
 }
 
 /// Gemini adapter implementation
-/// 
-/// Creates an adapter for communicating with Google's Gemini API.
-/// Supports Gemini 2.5 Pro, Gemini 2.5 Flash, and other Gemini models.
 pub fn gemini_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "gemini",

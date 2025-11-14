@@ -1,11 +1,3 @@
-//// OpenAI adapter implementation
-////
-//// This module provides the adapter implementation for OpenAI's API,
-//// including GPT-4, GPT-5, and other OpenAI models. It handles request
-//// formatting, response parsing, and streaming for OpenAI's chat completion API.
-////
-//// Supports all OpenAI response modes: Tools, Json, JsonSchema, and MdJson.
-
 import gleam/http.{Post}
 import gleam/json
 import gleam/option.{None, Some}
@@ -18,9 +10,6 @@ import instructor/types.{
 }
 
 /// OpenAI adapter implementation
-/// 
-/// Creates an adapter for communicating with OpenAI's API.
-/// Supports all GPT models including GPT-4o, GPT-5, and O1 series.
 pub fn openai_adapter() -> adapter.Adapter(String) {
   adapter.Adapter(
     name: "openai",

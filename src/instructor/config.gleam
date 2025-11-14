@@ -1,28 +1,7 @@
-//// Configuration utilities for Instructor
-////
-//// This module provides configuration builders and helpers for setting up
-//// different LLM provider configurations (OpenAI, Anthropic, Gemini, Groq, Ollama).
-//// It includes default configurations and builder functions for customizing
-//// model selection, retries, temperature, and other parameters.
-////
-//// ## Example
-////
-//// ```gleam
-//// import instructor/config
-////
-//// let config = config.openai_config("your-api-key", None)
-////   |> config.with_model("gpt-4o")
-////   |> config.with_temperature(0.7)
-////   |> config.with_max_retries(3)
-//// ```
-
 import gleam/option.{type Option, None, Some}
 import instructor/types
 
 /// Global configuration for Instructor
-/// 
-/// Contains all settings needed for making LLM requests, including
-/// adapter configuration, default model, retry settings, and timeout values.
 pub type Config {
   Config(
     default_adapter: types.AdapterConfig,
