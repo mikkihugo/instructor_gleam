@@ -1,6 +1,6 @@
 name: CI
 permissions:
-  contents: read
+  contents: write
 
 on:
   push:
@@ -20,5 +20,18 @@ jobs:
           gleam-version: "1.12"
 
       - run: gleam deps download
-      - run: gleam format --check
+
+      - name: Auto format Gleam files
+        run: gleam format
+
+      - name: Commit formatting fixes (if any)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ `git status --porcelain` ]]; then
+            git add .
+            git commit -m "chore: auto-format Gleam files"
+            git push
+          fi
+
       - run: gleam test
