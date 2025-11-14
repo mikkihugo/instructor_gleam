@@ -167,9 +167,7 @@ pub fn schema_to_json(schema: JsonSchema) -> json.Json {
     additional_properties,
   ) = schema
 
-  let base_fields = [
-    #("type", json.string(type_)),
-  ]
+  let base_fields = [#("type", json.string(type_))]
 
   let with_properties = case properties {
     Some(props) -> {

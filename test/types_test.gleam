@@ -69,7 +69,7 @@ pub fn message_to_json_user_test() {
   let msg = types.Message(types.User, "Hello")
   let json_result = types.message_to_json(msg)
   let json_str = json.to_string(json_result)
-  
+
   json_str |> should.not_equal("")
 }
 
@@ -77,7 +77,7 @@ pub fn message_to_json_system_test() {
   let msg = types.Message(types.System, "You are a helpful assistant")
   let json_result = types.message_to_json(msg)
   let json_str = json.to_string(json_result)
-  
+
   json_str |> should.not_equal("")
 }
 
@@ -85,7 +85,7 @@ pub fn message_to_json_assistant_test() {
   let msg = types.Message(types.Assistant, "I can help you")
   let json_result = types.message_to_json(msg)
   let json_str = json.to_string(json_result)
-  
+
   json_str |> should.not_equal("")
 }
 
@@ -96,10 +96,10 @@ pub fn messages_to_json_test() {
     types.Message(types.User, "Hello"),
     types.Message(types.Assistant, "Hi there!"),
   ]
-  
+
   let json_result = types.messages_to_json(messages)
   let json_str = json.to_string(json_result)
-  
+
   json_str |> should.not_equal("")
 }
 
@@ -107,7 +107,7 @@ pub fn messages_to_json_empty_test() {
   let messages = []
   let json_result = types.messages_to_json(messages)
   let json_str = json.to_string(json_result)
-  
+
   json_str |> should.equal("[]")
 }
 
@@ -158,42 +158,45 @@ pub fn message_decoder_tool_test() {
 
 // Test HttpRequest creation
 pub fn http_request_test() {
-  let req = types.HttpRequest(
-    method: http.Post,
-    url: "https://api.example.com/chat",
-    headers: [#("Authorization", "Bearer token")],
-    body: "{\"message\":\"hello\"}",
-  )
-  
+  let req =
+    types.HttpRequest(
+      method: http.Post,
+      url: "https://api.example.com/chat",
+      headers: [#("Authorization", "Bearer token")],
+      body: "{\"message\":\"hello\"}",
+    )
+
   req.url |> should.equal("https://api.example.com/chat")
   req.body |> should.equal("{\"message\":\"hello\"}")
 }
 
 // Test HttpResponse creation
 pub fn http_response_test() {
-  let resp = types.HttpResponse(
-    status: 200,
-    headers: [#("Content-Type", "application/json")],
-    body: "{\"result\":\"success\"}",
-  )
-  
+  let resp =
+    types.HttpResponse(
+      status: 200,
+      headers: [#("Content-Type", "application/json")],
+      body: "{\"result\":\"success\"}",
+    )
+
   resp.status |> should.equal(200)
   resp.body |> should.equal("{\"result\":\"success\"}")
 }
 
 // Test ChatParams creation
 pub fn chat_params_test() {
-  let params = types.ChatParams(
-    model: "gpt-4",
-    messages: [types.Message(types.User, "Hello")],
-    temperature: Some(0.7),
-    max_tokens: Some(1000),
-    stream: False,
-    mode: types.Tools,
-    max_retries: 3,
-    validation_context: [],
-  )
-  
+  let params =
+    types.ChatParams(
+      model: "gpt-4",
+      messages: [types.Message(types.User, "Hello")],
+      temperature: Some(0.7),
+      max_tokens: Some(1000),
+      stream: False,
+      mode: types.Tools,
+      max_retries: 3,
+      validation_context: [],
+    )
+
   params.model |> should.equal("gpt-4")
   params.stream |> should.be_false()
   params.max_retries |> should.equal(3)
@@ -202,7 +205,7 @@ pub fn chat_params_test() {
 // Test LLMResult variants
 pub fn llm_result_success_test() {
   let result: types.LLMResult(String) = types.Success("test result")
-  
+
   case result {
     types.Success(data) -> data |> should.equal("test result")
     types.ValidationError(_) -> should.fail()
@@ -211,8 +214,9 @@ pub fn llm_result_success_test() {
 }
 
 pub fn llm_result_validation_error_test() {
-  let result: types.LLMResult(String) = types.ValidationError(["Error 1", "Error 2"])
-  
+  let result: types.LLMResult(String) =
+    types.ValidationError(["Error 1", "Error 2"])
+
   case result {
     types.ValidationError(errors) -> {
       case errors {
@@ -227,7 +231,7 @@ pub fn llm_result_validation_error_test() {
 
 pub fn llm_result_adapter_error_test() {
   let result: types.LLMResult(String) = types.AdapterError("Connection failed")
-  
+
   case result {
     types.AdapterError(msg) -> msg |> should.equal("Connection failed")
     types.Success(_) -> should.fail()
@@ -238,7 +242,7 @@ pub fn llm_result_adapter_error_test() {
 // Test AdapterConfig variants
 pub fn adapter_config_openai_test() {
   let config = types.OpenAIConfig("test-key", Some("https://custom.api"))
-  
+
   case config {
     types.OpenAIConfig(api_key, base_url) -> {
       api_key |> should.equal("test-key")
@@ -249,7 +253,7 @@ pub fn adapter_config_openai_test() {
 
 pub fn adapter_config_anthropic_test() {
   let config = types.AnthropicConfig("test-key", None)
-  
+
   case config {
     types.AnthropicConfig(api_key, base_url) -> {
       api_key |> should.equal("test-key")
@@ -260,7 +264,7 @@ pub fn adapter_config_anthropic_test() {
 
 pub fn adapter_config_gemini_test() {
   let config = types.GeminiConfig("test-key", None)
-  
+
   case config {
     types.GeminiConfig(api_key, base_url) -> {
       api_key |> should.equal("test-key")
@@ -271,7 +275,7 @@ pub fn adapter_config_gemini_test() {
 
 pub fn adapter_config_groq_test() {
   let config = types.GroqConfig("test-key", None)
-  
+
   case config {
     types.GroqConfig(api_key, base_url) -> {
       api_key |> should.equal("test-key")
@@ -282,15 +286,16 @@ pub fn adapter_config_groq_test() {
 
 pub fn adapter_config_ollama_test() {
   let config = types.OllamaConfig("http://localhost:11434")
-  
+
   case config {
-    types.OllamaConfig(base_url) -> base_url |> should.equal("http://localhost:11434")
+    types.OllamaConfig(base_url) ->
+      base_url |> should.equal("http://localhost:11434")
   }
 }
 
 pub fn adapter_config_llamacpp_test() {
   let config = types.LlamaCppConfig("http://localhost:8080", Some("llama3"))
-  
+
   case config {
     types.LlamaCppConfig(base_url, chat_template) -> {
       base_url |> should.equal("http://localhost:8080")
@@ -301,8 +306,9 @@ pub fn adapter_config_llamacpp_test() {
 
 pub fn adapter_config_vllm_test() {
   let config = types.VLLMConfig("http://localhost:8000")
-  
+
   case config {
-    types.VLLMConfig(base_url) -> base_url |> should.equal("http://localhost:8000")
+    types.VLLMConfig(base_url) ->
+      base_url |> should.equal("http://localhost:8000")
   }
 }

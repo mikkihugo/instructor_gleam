@@ -11,63 +11,63 @@ pub fn main() {
 pub fn extract_error_message_400_test() {
   let response = types.HttpResponse(400, [], "Bad request body")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Bad Request: Bad request body")
 }
 
 pub fn extract_error_message_401_test() {
   let response = types.HttpResponse(401, [], "")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Unauthorized: Check your API key")
 }
 
 pub fn extract_error_message_403_test() {
   let response = types.HttpResponse(403, [], "")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Forbidden: Insufficient permissions")
 }
 
 pub fn extract_error_message_404_test() {
   let response = types.HttpResponse(404, [], "")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Not Found: Invalid endpoint or model")
 }
 
 pub fn extract_error_message_429_test() {
   let response = types.HttpResponse(429, [], "")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Rate Limited: Too many requests")
 }
 
 pub fn extract_error_message_500_test() {
   let response = types.HttpResponse(500, [], "Server error details")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Internal Server Error: Server error details")
 }
 
 pub fn extract_error_message_502_test() {
   let response = types.HttpResponse(502, [], "")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Bad Gateway: Service temporarily unavailable")
 }
 
 pub fn extract_error_message_503_test() {
   let response = types.HttpResponse(503, [], "Maintenance")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("Service Unavailable: Maintenance")
 }
 
 pub fn extract_error_message_other_test() {
   let response = types.HttpResponse(418, [], "I'm a teapot")
   let msg = http_client.extract_error_message(response)
-  
+
   msg |> should.equal("HTTP 418: I'm a teapot")
 }
 
@@ -104,7 +104,7 @@ pub fn is_success_status_500_test() {
 pub fn add_common_headers_test() {
   let headers = [#("Authorization", "Bearer token")]
   let result = http_client.add_common_headers(headers, "test-agent/1.0")
-  
+
   // Should have at least 3 headers
   case result {
     [_, _, _, ..] -> True |> should.be_true()
@@ -115,7 +115,7 @@ pub fn add_common_headers_test() {
 pub fn add_common_headers_user_agent_test() {
   let headers = []
   let result = http_client.add_common_headers(headers, "test-agent/1.0")
-  
+
   // Check for User-Agent header
   case result {
     [#("User-Agent", "test-agent/1.0"), ..] -> True |> should.be_true()
@@ -126,7 +126,7 @@ pub fn add_common_headers_user_agent_test() {
 pub fn add_common_headers_accept_test() {
   let headers = []
   let result = http_client.add_common_headers(headers, "test-agent/1.0")
-  
+
   // Should contain Accept: application/json
   case result {
     [#("User-Agent", _), #("Accept", "application/json"), ..] ->
@@ -166,22 +166,26 @@ pub fn validate_url_no_protocol_test() {
 
 // Test build_api_url
 pub fn build_api_url_no_trailing_slash_test() {
-  let result = http_client.build_api_url("https://api.example.com", "chat/completions")
+  let result =
+    http_client.build_api_url("https://api.example.com", "chat/completions")
   result |> should.equal("https://api.example.com/chat/completions")
 }
 
 pub fn build_api_url_trailing_slash_test() {
-  let result = http_client.build_api_url("https://api.example.com/", "chat/completions")
+  let result =
+    http_client.build_api_url("https://api.example.com/", "chat/completions")
   result |> should.equal("https://api.example.com/chat/completions")
 }
 
 pub fn build_api_url_leading_slash_test() {
-  let result = http_client.build_api_url("https://api.example.com", "/chat/completions")
+  let result =
+    http_client.build_api_url("https://api.example.com", "/chat/completions")
   result |> should.equal("https://api.example.com/chat/completions")
 }
 
 pub fn build_api_url_both_slashes_test() {
-  let result = http_client.build_api_url("https://api.example.com/", "/chat/completions")
+  let result =
+    http_client.build_api_url("https://api.example.com/", "/chat/completions")
   result |> should.equal("https://api.example.com/chat/completions")
 }
 
@@ -191,7 +195,8 @@ pub fn build_api_url_empty_endpoint_test() {
 }
 
 pub fn build_api_url_complex_endpoint_test() {
-  let result = http_client.build_api_url("https://api.example.com", "v1/chat/completions")
+  let result =
+    http_client.build_api_url("https://api.example.com", "v1/chat/completions")
   result |> should.equal("https://api.example.com/v1/chat/completions")
 }
 
