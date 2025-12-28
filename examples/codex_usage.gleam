@@ -65,7 +65,7 @@ pub fn reasoning_example() {
           instructor.default_config(),
           instructor.Single(instructor.string_response_model("Architecture")),
           messages,
-          Some("gpt-5-codex"),
+          Some("gpt-5.2-codex"),
           // Use full model for architecture
           None,
           Some(2000),
@@ -92,8 +92,8 @@ pub fn smart_selection_example() {
 
   let tasks = [
     #("What is Rust?", "low", "codex-mini-latest"),
-    #("Implement error handling", "medium", "gpt-5-codex"),
-    #("Design system architecture", "high", "gpt-5-codex"),
+    #("Implement error handling", "medium", "gpt-5.2-codex"),
+    #("Design system architecture", "high", "gpt-5.2-codex"),
   ]
 
   list.each(tasks, fn(task) {

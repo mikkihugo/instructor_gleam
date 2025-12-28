@@ -44,7 +44,7 @@ pub fn openai_config_with_base_url_test() {
 // Test Anthropic config creation
 pub fn anthropic_config_test() {
   let cfg = config.anthropic_config("test-key", None)
-  cfg.default_model |> should.equal("claude-sonnet-4")
+  cfg.default_model |> should.equal("claude-sonnet-4.5")
 
   case cfg.default_adapter {
     types.AnthropicConfig(api_key, _) -> api_key |> should.equal("test-key")
@@ -55,7 +55,7 @@ pub fn anthropic_config_test() {
 // Test Gemini config creation
 pub fn gemini_config_test() {
   let cfg = config.gemini_config("test-key", None)
-  cfg.default_model |> should.equal("gemini-2.5-flash")
+  cfg.default_model |> should.equal("gemini-3-flash")
 
   case cfg.default_adapter {
     types.GeminiConfig(api_key, _) -> api_key |> should.equal("test-key")

@@ -10,31 +10,34 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 ## Features
 
 - **Structured Prompting**: Define response schemas and get validated structured data from LLMs
-- **Multiple LLM Providers**: Support for OpenAI (GPT-5), Anthropic (Claude 4), Gemini (2.5), Groq, and Ollama
+- **Multiple LLM Providers**: Support for OpenAI (GPT-5.2), Anthropic (Claude 4.5), Gemini (3), Groq, and Ollama
 - **Validation & Retry Logic**: Automatic retry with error feedback when responses don't match schemas
 - **Streaming Support**: Handle partial and array streaming responses
 - **Type Safe**: Full Gleam type safety for LLM interactions
 
-## Supported Models (2025)
+## Supported Models (December 2025)
 
 ### OpenAI
-- **gpt-5** - Latest GPT-5 model (Aug 2025) with 400K context, dynamic thinking mode
-- **gpt-5-pro** - GPT-5 Pro variant for advanced tasks
-- **gpt-4o** - GPT-4 Omni model
+- **gpt-5.2** - Latest GPT-5.2 model (Dec 2025) with Instant, Thinking, and Pro modes
+- **gpt-5.2-pro** - GPT-5.2 Pro variant for advanced enterprise tasks
+- **gpt-5** - GPT-5 base model with 400K context, dynamic thinking mode
+- **gpt-4o** - GPT-4 Omni model (legacy)
 - **gpt-4o-mini** - Fast, cost-effective GPT-4 variant
-- **o1-preview** - Advanced reasoning model
+- **o1** - Advanced reasoning model
 
-### Anthropic Claude 4
-- **claude-opus-4** - Most powerful Claude 4 model for complex coding and long-running tasks
-- **claude-sonnet-4** - Balanced performance with enhanced coding and reasoning (recommended)
-- **claude-3-5-sonnet-20241022** - Previous generation Claude 3.5
-- **claude-3-5-haiku-20241022** - Fast, efficient Claude 3.5
+### Anthropic Claude 4.5
+- **claude-opus-4.5** - Most powerful Claude 4.5 model for complex coding, agentic tasks, and 1M token context
+- **claude-sonnet-4.5** - Balanced performance with enhanced coding and reasoning (recommended)
+- **claude-haiku-4.5** - Fast, efficient with near-frontier capabilities
+- **claude-3-5-sonnet-20241022** - Previous generation Claude 3.5 (legacy)
+- **claude-3-5-haiku-20241022** - Fast, efficient Claude 3.5 (legacy)
 
-### Google Gemini 2.5
-- **gemini-2.5-pro** - Most capable Gemini 2.5 for complex reasoning
-- **gemini-2.5-flash** - High performance with cost efficiency (recommended)
-- **gemini-2.5-flash-lite** - Lightweight, high-throughput variant
-- **gemini-2.0-flash-exp** - Experimental Gemini 2.0
+### Google Gemini 3
+- **gemini-3-pro** - Most capable Gemini 3 for complex multimodal reasoning
+- **gemini-3-flash** - High performance with cost efficiency (recommended)
+- **gemini-3-flash-lite** - Lightweight, high-throughput variant
+- **gemini-2.5-pro** - Previous generation Gemini 2.5 (legacy)
+- **gemini-2.5-flash** - Previous generation Gemini 2.5 (legacy)
 
 ### Groq (Fast Inference)
 - **llama-3.3-70b-versatile** - Latest Llama 3.3
@@ -48,8 +51,8 @@ Instructor is a Gleam library for structured prompting with Large Language Model
 
 ### Codex (ChatGPT OAuth - Subscription Only)
 - **codex-mini-latest** - Fast, 200K context, optimized for speed ($1.50/$6 per 1M tokens)
-- **gpt-5-codex** - Full quality, 272K context, better reasoning
-- **gpt-5** - General purpose, 272K context
+- **gpt-5.2-codex** - Full quality, 400K context, best reasoning
+- **gpt-5.2** - General purpose, 400K context
 
 **Authentication**: Requires `~/.codex/auth.json` (run: `codex login`)
 **Reasoning Effort**: `minimal`, `low`, `medium`, `high` (thinking depth)
@@ -229,10 +232,10 @@ Add to your `gleam.toml`:
 
 ```toml
 [dependencies]
-gleam_stdlib = "~> 0.34"
-gleam_http = "~> 4.1"
+gleam_stdlib = "~> 0.67"
+gleam_http = "~> 4.3"
 gleam_httpc = "~> 5.0"
-gleam_json = "~> 3.0"
+gleam_json = "~> 3.1"
 ```
 
 ## License
