@@ -13,12 +13,12 @@
 //// ## Supported Models
 ////
 //// - `codex-mini-latest` - Fast, 200k context, based on o4-mini
-//// - `gpt-5-codex` - Full quality, 272k context, better reasoning
-//// - `gpt-5` - General purpose, 272k context
+//// - `gpt-5.2-codex` - Full quality, 400k context, best reasoning
+//// - `gpt-5.2` - General purpose, 400k context
 ////
 //// ## Reasoning Effort Levels
 ////
-//// - `minimal` - gpt-5 only, fastest
+//// - `minimal` - gpt-5.2 only, fastest
 //// - `low` - Quick reasoning
 //// - `medium` - Balanced (default)
 //// - `high` - Maximum quality, slowest

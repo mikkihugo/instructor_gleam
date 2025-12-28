@@ -1,6 +1,6 @@
 name = "instructor"
 version = "1.2.0"
-description = "Structured prompting for Large Language Models with type-safe validation, streaming support, and multiple provider adapters (OpenAI GPT-5, Anthropic Claude 4, Gemini 2.5, Groq, Ollama)"
+description = "Structured prompting for Large Language Models with type-safe validation, streaming support, and multiple provider adapters (OpenAI GPT-5.2, Anthropic Claude 4.5, Gemini 3, Groq, Ollama)"
 licences = ["MIT"]
 repository = { type = "github", user = "mikkihugo", repo = "instructor_gleam" }
 
@@ -14,8 +14,8 @@ target = "erlang"
 [dependencies]
 gleam_http = "~> 4.3"
 gleam_httpc = "~> 5.0"
-gleam_json = "~> 3.0"
-gleam_stdlib = ">= 0.65.0 and < 1.0.0"
+gleam_json = "~> 3.1"
+gleam_stdlib = ">= 0.67.0 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
