@@ -13,6 +13,6 @@ packages = [
 [requirements]
 gleam_http = { version = "~> 4.3" }
 gleam_httpc = { version = "~> 5.0" }
-gleam_json = { version = "~> 3.0" }
+gleam_json = { version = "~> 3.1" }
 gleam_stdlib = { version = ">= 0.67.0 and < 1.0.0" }
 gleeunit = { version = "~> 1.0" }
