@@ -190,8 +190,8 @@ pub fn get_recommended_models(config: Config) -> List(String) {
       "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022",
     ]
     types.GeminiConfig(_, _) -> [
-      "gemini-3-pro", "gemini-3-flash", "gemini-3-flash-lite",
-      "gemini-2.5-pro", "gemini-2.5-flash",
+      "gemini-3-pro", "gemini-3-flash", "gemini-3-flash-lite", "gemini-2.5-pro",
+      "gemini-2.5-flash",
     ]
     types.GroqConfig(_, _) -> [
       "llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama3-8b-8192",
